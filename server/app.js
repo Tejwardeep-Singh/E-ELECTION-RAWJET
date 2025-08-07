@@ -10,7 +10,7 @@ require("./config/mongooseConnection");
 
 // ✅ Correct CORS (only once and before routes)
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174','https://voterrawjet.onrender.com/','https://adminrawjet.onrender.com/'],
+  origin: ['http://localhost:5173', 'http://localhost:5174','https://voterrawjet.onrender.com','https://adminrawjet.onrender.com'],
   credentials: true
 }));
 
