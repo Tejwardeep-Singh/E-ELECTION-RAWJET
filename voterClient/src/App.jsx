@@ -4,7 +4,7 @@ import Nav from './components/Nav';
 import Home from './components/pages/Home';
 import VoterLogin from './components/pages/voterLogin';
 import VoterRegister from './components/pages/voterRegister';
-import Copywright from './components/copywright';
+import Copywright from './components/Copywrightopywright';
 import VoterDashboard from './components/pages/voterDashboard';
 import VoterResults from './components/pages/voterResults';
 import Timer from './components/pages/Timer';
