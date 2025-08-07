@@ -1,9 +1,9 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Nav from './components/nav';
+import Nav from './components/Nav';
 import Home from './components/pages/Home';
 import HeadLogin from './components/pages/HeadLogin';
-import Copywright from './components/copywright';
+import Copywright from './components/Copywright';
 import HeadDashboard from './components/pages/HeadDashboard';
 import AddAdminForm from './components/pages/addAdminForm';
 import ViewAdmins from './components/pages/ViewAdmins';
