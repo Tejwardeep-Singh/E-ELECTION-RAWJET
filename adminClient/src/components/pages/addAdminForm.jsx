@@ -24,7 +24,7 @@ export default function AddAdminForm() {
 
     try {
       const baseURL = import.meta.env.VITE_API_BASE_URL;
-      const res = await axios.post(`${baseURL}/head/add`, formData);
+      const res = await axios.post(`${baseURL}/api/head/add`, formData);
       setMessage(res.data.message);
       setFormData({ userId: '', name: '', password: '' });
     } catch (err) {

@@ -13,7 +13,7 @@ export default function VoterLogin() {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/voter/login`, formData);
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/voter/login`, formData);
       localStorage.setItem('voterToken', res.data.token);
       navigate('/voter/dashboard'); // Voter dashboard
     } catch (err) {

@@ -8,13 +8,13 @@ export default function DeleteAdmin() {
   const navigate = useNavigate();
 
   const fetchAdmins = () => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/head/view`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/head/view`)
       .then(res => setAdmins(res.data))
       .catch(err => console.error(err));
   };
 
   const deleteAdmin = (id) => {
-    axios.delete(`${import.meta.env.VITE_API_BASE_URL}/admin/delete/${id}`)
+    axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/admin/delete/${id}`)
       .then(() => fetchAdmins())
       .catch(err => console.error(err));
   };

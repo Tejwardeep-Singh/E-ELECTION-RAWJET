@@ -21,7 +21,7 @@ export default function RegisterVoter() {
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/voter/register`, formData);
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/voter/register`, formData);
       alert('Voter registered successfully!');
       navigate('/voter/login');
     } catch (err) {

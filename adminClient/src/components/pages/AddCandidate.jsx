@@ -25,7 +25,7 @@ export default function AddCandidate() {
     data.append('partyImage', partyImage);
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/admin/candidate/add`, data);
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/add`, data);
       alert("Candidate added successfully!");
       navigate('/admin/dashboard');
     } catch (err) {

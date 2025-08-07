@@ -8,7 +8,7 @@ export default function ViewAdmins() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/head/view`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/head/view`)
       .then(res => setAdmins(res.data))
       .catch(err => console.error('Error fetching admins:', err));
   }, []);

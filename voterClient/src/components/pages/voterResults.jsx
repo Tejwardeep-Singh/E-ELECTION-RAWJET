@@ -10,7 +10,7 @@ export default function VoterResult() {
     const fetchResults = async () => {
       try {
         const token = localStorage.getItem('voterToken'); // make sure token key is correct
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/voter/results`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/voter/results`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

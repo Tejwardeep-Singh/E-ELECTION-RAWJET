@@ -16,7 +16,7 @@ export default function VoterDashboard() {
   };
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/voter/me`, {
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/voter/me`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => {
@@ -26,20 +26,20 @@ export default function VoterDashboard() {
       })
       .catch(err => console.error('Failed to fetch voter:', err));
 
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/election/status`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/election/status`)
       .then(res => setElectionStatus(res.data))
       .catch(err => console.error('Failed to fetch election status:', err));
   }, []);
 
   const fetchCandidates = (area) => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/candidate/by-area/${area}`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/by-area/${area}`)
       .then(res => setCandidates(res.data))
       .catch(err => console.error('Failed to fetch candidates:', err));
   };
 
   const handleVote = async (candidateId) => {
     try {
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/voter/vote/${candidateId}`, {}, {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/voter/vote/${candidateId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert('Vote submitted successfully!');

@@ -8,7 +8,7 @@ export default function DeleteCandidate() {
   const navigate = useNavigate();
 
   const fetchData = () => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/candidate/view`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/view`)
       .then(res => setCandidates(res.data))
       .catch(err => console.error(err));
   };
@@ -20,7 +20,7 @@ export default function DeleteCandidate() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this candidate?")) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/admin/candidate/delete/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/delete/${id}`);
       alert("Candidate deleted!");
       fetchData();
     } catch (err) {

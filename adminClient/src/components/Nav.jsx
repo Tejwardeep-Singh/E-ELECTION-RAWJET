@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom'; // ✅ import Link
+import { Link } from 'react-router-dom'; 
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
@@ -11,7 +11,7 @@ export default function Nav() {
         {/* Left Logo/Brand */}
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-blue-900 font-bold">
-            <span><img src="../public/logo.png" alt="logo here" /></span>
+            <span><img src="/logo.png" alt="logo here" /></span>
           </div>
           <span className="text-xl font-semibold">Admin Panel</span>
         </div>

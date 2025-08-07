@@ -7,7 +7,7 @@ const CountdownTimer = ({ onElectionEnd }) => {
   useEffect(() => {
     const fetchTimer = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/api/election/timer');
+        const res = await axios.get('http://${import.meta.env.VITE_API_BASE_URL}/api/election/timer');
         const time = res.data.timeRemaining;
         setTimeLeft(time);
         if (time === 0 && onElectionEnd) onElectionEnd();

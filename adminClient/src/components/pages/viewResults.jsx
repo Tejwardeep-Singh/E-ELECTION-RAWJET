@@ -7,7 +7,8 @@ export default function ResultsDashboard({ role }) {
 
   const fetchResults = async () => {
     try {
-      const res = await axios.get(`http://localhost:3000/api/results?area=${area}&role=${role}`);
+      const baseURL = import.meta.env.VITE_API_BASE_URL;
+      const res = await axios.get(`http://${baseURL}/api/results?area=${area}&role=${role}`);
       setResults(res.data);
     } catch (err) {
       console.error(err);

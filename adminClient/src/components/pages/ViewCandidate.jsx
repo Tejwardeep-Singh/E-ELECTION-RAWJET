@@ -8,7 +8,7 @@ export default function ViewCandidates() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/candidate/view`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/view`)
       .then(res => setCandidates(res.data))
       .catch(err => console.error(err));
   }, []);

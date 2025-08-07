@@ -8,7 +8,7 @@ export default function EditCandidate() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/admin/candidate/view`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/view`)
       .then(res => setCandidates(res.data))
       .catch(err => console.error(err));
   }, []);
@@ -19,7 +19,7 @@ export default function EditCandidate() {
     const data = new FormData(form);
 
     try {
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/admin/candidate/edit/${id}`, data);
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/edit/${id}`, data);
       alert("Candidate updated!");
       window.location.reload();
     } catch (err) {
