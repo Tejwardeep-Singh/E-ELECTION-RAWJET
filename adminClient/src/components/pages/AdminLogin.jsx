@@ -13,7 +13,7 @@ export default function AdminLogin() {
     e.preventDefault();
     try {
       const baseURL = import.meta.env.VITE_API_BASE_URL;
-      const res = await axios.post(`${baseURL}/adminLogin`, formData);
+      const res = await axios.post(`${baseURL}/api/adminLogin`, formData);
       localStorage.setItem('adminToken', res.data.token);
       navigate('/admin/dashboard');
     } catch (err) {

@@ -39,10 +39,9 @@ export default function Nav() {
             <Link to="/" onClick={() => setOpen(false)} className="hover:text-blue-300 transition">Home</Link>
           </li>
           <li>
-            <Link to="/admin" onClick={() => setOpen(false)} className="hover:text-blue-300 transition">Admin</Link>
+            <Link to="/voter/login" className="hover:text-blue-300 transition">voter</Link>
           </li>
           <li>
-            <Link to="/head" onClick={() => setOpen(false)} className="hover:text-blue-300 transition">Head</Link>
           </li>
         </ul>
       )}
