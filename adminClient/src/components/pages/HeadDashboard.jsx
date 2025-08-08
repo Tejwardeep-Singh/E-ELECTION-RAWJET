@@ -48,7 +48,7 @@ export default function HeadDashboard() {
             🏛️ View Parties & Candidates
           </button>
           <button
-            onClick={() => handleNavigate('/head/election)}
+            onClick={() => handleNavigate('/head/election')}
             className="bg-indigo-700 text-white py-4 rounded-xl hover:bg-indigo-600 transition text-lg font-semibold shadow-md">
             🕒 Election Controls
           </button>
