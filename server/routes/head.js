@@ -92,8 +92,8 @@ router.post('/set', async (req, res) => {
     } else {
       // If no config found, create a new one
       config = new electionConfig({
-        startTime,
-        endTime,
+        startTime:start,
+        endTime:end,
         electionLive: true,          // explicitly set to true
         resultVisible: false         // explicitly set to false
       });
