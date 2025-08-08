@@ -38,7 +38,9 @@ app.use("/api/election",electionRoutes);
 app.use("/api/results",resultsRouter);
 
 
-
+// app.get('/*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+// });
 // Start server
 
 app.listen(PORT, () => {

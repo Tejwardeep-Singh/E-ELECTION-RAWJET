@@ -61,7 +61,7 @@ export default function HeadDashboard() {
           <button
             onClick={async () => {
               try {
-                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/head/show-results`, {
+                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/head/show-results`, {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
