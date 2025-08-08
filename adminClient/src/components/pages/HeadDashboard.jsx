@@ -42,18 +42,18 @@ export default function HeadDashboard() {
           </button>
 
           <button
-            onClick={() => handleNavigate('/head/parties')}
+            onClick={() => handleNavigate('/head/candidates')}
             className="bg-yellow-600 text-white py-4 rounded-xl hover:bg-yellow-500 transition text-lg font-semibold shadow-md"
           >
             🏛️ View Parties & Candidates
           </button>
           <button
-            onClick={() => handleNavigate('/head/candidates')}
+            onClick={() => handleNavigate('/head/election)}
             className="bg-indigo-700 text-white py-4 rounded-xl hover:bg-indigo-600 transition text-lg font-semibold shadow-md">
             🕒 Election Controls
           </button>
           <button
-            onClick={() => handleNavigate('/head/election')}
+            onClick={() => handleNavigate('/head/results')}
             className="bg-purple-700 text-white py-4 rounded-xl hover:bg-purple-600 transition text-lg font-semibold shadow-md"
           >
             📊 View Results
