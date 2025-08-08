@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Admin = require("../models/admin");
+const Candidate = require("../models/candidate");
 const electionConfig=require("../models/elections");
 const bcrypt = require("bcrypt");
+const moment = require('moment-timezone'); 
 
 // POST /api/admins
 router.post("/add", async (req, res) => {
@@ -29,7 +31,19 @@ router.post("/add", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+router.get('/candidates/:area', async (req, res) => {
+  try {
+    const area = req.params.area;
 
+    // Case-insensitive search
+    const candidates = await Candidate.find({ area: { $regex: new RegExp(area, 'i') } });
+
+    res.status(200).json(candidates);
+  } catch (error) {
+    console.error('Error fetching candidates by area:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 // Get all admins
 router.get("/view", async (req, res) => {
   const admins = await Admin.find();
@@ -65,13 +79,14 @@ router.get('/election', async (req, res) => {
 router.post('/set', async (req, res) => {
   try {
     const { startTime, endTime } = req.body;
-
+    const start = moment.tz(startTime, 'Asia/Kolkata').toDate();
+    const end = moment.tz(endTime, 'Asia/Kolkata').toDate();
     let config = await electionConfig.findOne();
 
     if (config) {
       // If a config exists, update its fields
-      config.startTime = startTime;
-      config.endTime = endTime;
+      config.startTime = start;
+      config.endTime = end;
       config.electionLive = true;  
       config.resultVisible=false;   // explicitly set to true
     } else {

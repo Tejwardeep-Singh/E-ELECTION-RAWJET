@@ -6,7 +6,7 @@ const Candidate = require('../models/candidate');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const ElectionConfig = require('../models/elections');
-const moment = require('moment-timezone'); // Install via: npm i moment-timezone
+const moment = require('moment-timezone'); 
 
 
 // Get election live status

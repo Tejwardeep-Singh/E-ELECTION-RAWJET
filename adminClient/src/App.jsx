@@ -18,6 +18,7 @@ import DeleteCandidate from './components/pages/DeleteCandidate';
 import Election from './components/pages/setElection';
 import ResultsDashboard from './components/pages/viewResults';
 import Timer from './components/pages/Timer';
+import ViewCandidatesByArea from './components/pages/ViewCandidatesByArea';
 
 
 export default function App() {
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="/admin/candidate/view" element={<ViewCandidate />} />
         <Route path="/admin/results" element={<ResultsDashboard role="admin" />} />
         <Route path="/head/results" element={<ResultsDashboard role="head" />} />
+        <Route path="/head/candidates" element={<ViewCandidatesByArea />} />
         
 
 
