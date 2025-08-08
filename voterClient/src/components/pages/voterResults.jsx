@@ -37,6 +37,12 @@ export default function VoterResult() {
 
   return (
     <div className="p-4">
+      <button
+        className="mb-4 bg-gray-700 text-white px-4 py-2 rounded"
+        onClick={() => navigate('/voter/dashboard')}
+      >
+         Back to Dashboard
+      </button>
       <h2 className="text-xl font-bold mb-2">Election Results - {area}</h2>
       {results.length === 0 ? (
         <p>No candidates found in your area.</p>

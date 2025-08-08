@@ -9,7 +9,7 @@ export default function SetElection() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('${import.meta.env.VITE_API_BASE_URL}/api/head/set', {
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/head/set`, {
         startTime,
         endTime
       });
@@ -21,6 +21,12 @@ export default function SetElection() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <button
+        className="mb-4 bg-gray-700 text-white px-4 py-2 rounded"
+        onClick={() => navigate('/head/dashboard')}
+      >
+        🔙 Back to Dashboard
+      </button>
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-lg">
         <h2 className="text-2xl font-bold text-blue-900 mb-6 text-center">Set Election Start & End Time</h2>
 

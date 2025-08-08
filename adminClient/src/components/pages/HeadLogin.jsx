@@ -24,7 +24,6 @@ export default function HeadLogin() {
     try {
       const baseURL = import.meta.env.VITE_API_BASE_URL;
       const res = await axios.post(`${baseURL}/api/headLogin`, formData);
-      console.log('Login success:', res.data);
 
       localStorage.setItem('headToken', res.data.token);
       navigate('/head/dashboard');
