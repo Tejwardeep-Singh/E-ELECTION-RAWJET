@@ -53,7 +53,7 @@ export default function HeadDashboard() {
             🕒 Election Controls
           </button>
           <button
-            onClick={() => handleNavigate('/head/results')}
+            onClick={() => handleNavigate('/head/election')}
             className="bg-purple-700 text-white py-4 rounded-xl hover:bg-purple-600 transition text-lg font-semibold shadow-md"
           >
             📊 View Results
