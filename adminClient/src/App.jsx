@@ -4,7 +4,7 @@ import Nav from './components/Nav';
 import Home from './components/pages/Home';
 import HeadLogin from './components/pages/HeadLogin';
 import Copywright from './components/Copywright';
-import HeadDashboard from './components/pages/HeadDashboard';
+import HeadDashboard from './components/pages/headDashboard';
 import AddAdminForm from './components/pages/addAdminForm';
 import ViewAdmins from './components/pages/ViewAdmins';
 import EditAdmin from './components/pages/EditAdmin';

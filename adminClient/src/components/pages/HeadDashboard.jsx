@@ -83,7 +83,32 @@ export default function HeadDashboard() {
           >
             📢 Make Results Visible
           </button>
+          <button
+            onClick={async () => {
+              if (!window.confirm('⚠️ Are you sure you want to reset the election? This will delete all candidates and reset voters.')) return;
 
+              try {
+                const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/head/reset-election`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                });
+                const data = await res.json();
+                if (res.ok) {
+                  alert('✅ Election reset successfully!');
+                } else {
+                  alert('⚠️ ' + data.message);
+                }
+              } catch (err) {
+                console.error('Error resetting election:', err);
+                alert('Error resetting election.');
+              }
+            }}
+            className="bg-red-700 text-white py-4 rounded-xl hover:bg-red-600 transition text-lg font-semibold shadow-md"
+          >
+            🔄 Reset Election
+          </button>
         </div>
       </div>
     </div>

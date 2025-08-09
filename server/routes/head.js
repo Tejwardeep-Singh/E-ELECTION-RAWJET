@@ -3,6 +3,7 @@ const router = express.Router();
 const Admin = require("../models/admin");
 const Candidate = require("../models/candidate");
 const electionConfig=require("../models/elections");
+const Voter=require("../models/voter");
 const bcrypt = require("bcrypt");
 const moment = require('moment-timezone'); 
 
@@ -74,8 +75,24 @@ router.get('/election', async (req, res) => {
   }
 });
 
-// Route: POST /head/election
-// Set or update election timing
+
+
+// Reset election: delete candidates & reset voter votes
+router.post('/reset-election', async (req, res) => {
+  try {
+    // Delete all candidates
+    await Candidate.deleteMany({});
+
+    // Reset voters' voting status
+    await Voter.updateMany({}, { $set: { hasVoted: false } });
+
+    res.status(200).json({ message: 'Election reset successfully' });
+  } catch (err) {
+    console.error('Error resetting election:', err);
+    res.status(500).json({ message: 'Server error during reset' });
+  }
+});
+
 router.post('/set', async (req, res) => {
   try {
     const { startTime, endTime } = req.body;
