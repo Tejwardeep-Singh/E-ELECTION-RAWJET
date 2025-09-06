@@ -6,6 +6,7 @@ export default function SetElection() {
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,13 +22,15 @@ export default function SetElection() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 flex-column items-center justify-center p-6">
+    <div className='h-full w-screen p-10'>
       <button
         className="mb-4 bg-gray-700 text-white px-4 py-2 rounded"
         onClick={() => navigate('/head/dashboard')}
       >
-        🔙 Back to Dashboard
+         Back to Dashboard
       </button>
+      <div className="h-auto w-full bg-gray-50 flex flex-col items-center justify-center p-6">
+      
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-lg">
         <h2 className="text-2xl font-bold text-blue-900 mb-6 text-center">Set Election Start & End Time</h2>
 
@@ -61,6 +64,7 @@ export default function SetElection() {
           {message && <p className="text-center mt-4 font-medium text-green-600">{message}</p>}
         </form>
       </div>
+    </div>
     </div>
   );
 }

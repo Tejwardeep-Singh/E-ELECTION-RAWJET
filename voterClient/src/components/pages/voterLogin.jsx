@@ -23,7 +23,7 @@ export default function VoterLogin() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6">
+    <div className="max-w-md mx-auto p-6 h-screen">
       <h2 className="text-xl font-bold mb-4">Voter Login</h2>
       <form onSubmit={handleSubmit} className="space-y-3">
         <input

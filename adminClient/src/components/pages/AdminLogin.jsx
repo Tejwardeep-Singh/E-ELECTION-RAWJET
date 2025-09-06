@@ -23,16 +23,17 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-50">
-      <form onSubmit={handleSubmit} className="p-6 bg-white shadow rounded w-96 space-y-4">
-        <h2 className="text-xl font-bold text-center">Admin Login</h2>
+    <div className='min-h-screen bg-gray-50 flex items-center justify-center font-sans'>
+      <div className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-md border border-blue-100">
+      <form onSubmit={handleSubmit} className="p-6 bg-white  rounded-2xl w-96 space-y-6">
+        <h2 className="text-xl font-bold text-center text-blue">Admin Login</h2>
         <input
           name="userId"
           value={formData.userId}
           onChange={handleChange}
           placeholder="User ID"
           required
-          className="w-full border px-3 py-2 rounded"
+          className="w-full border px-3 py-2 rounded text-center text-blue"
         />
         <input
           name="password"
@@ -41,10 +42,11 @@ export default function AdminLogin() {
           onChange={handleChange}
           placeholder="Password"
           required
-          className="w-full border px-3 py-2 rounded"
+          className="w-full border px-3 py-2 rounded text-center text-blue "
         />
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded">Login</button>
+        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded text-center">Login</button>
       </form>
+    </div>
     </div>
   );
 }

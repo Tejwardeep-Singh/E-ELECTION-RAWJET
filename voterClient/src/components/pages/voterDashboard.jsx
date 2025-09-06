@@ -51,11 +51,12 @@ export default function VoterDashboard() {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Welcome to Voter Dashboard</h2>
+    <div className="w-full h-screen max-w-4xl mx-auto bg-white p-10">
+      <div className='h-screen/2 p-10 bg-gray-600 rounded-lg'>
+        <h2 className="text-2xl font-bold mb-4 text-white">Welcome to Voter Dashboard</h2>
 
       {voter && (
-        <div className="mb-6 text-lg">
+        <div className="mb-6 text-lg text-white">
           <p><strong>Name:</strong> {voter.name}</p>
           <p><strong>Area:</strong> {voter.area}</p>
           <p><strong>Status:</strong> {voted ? "You have voted" : "You have not voted"}</p>
@@ -64,13 +65,13 @@ export default function VoterDashboard() {
 
       {/* Candidate Details */}
       <div className="mb-6">
-        <h3 className="text-xl font-semibold mb-2">Candidates in Your Area</h3>
+        <h3 className="text-xl font-semibold mb-2 text-white">Candidates in Your Area</h3>
         {candidates.length === 0 ? (
           <p>No candidates available.</p>
         ) : (
           <div className="grid gap-4">
             {candidates.map(candidate => (
-              <div key={candidate._id} className="p-4 border rounded shadow-sm">
+              <div key={candidate._id} className="p-4 border rounded-lg shadow-sm bg-white">
                 <h4 className="font-bold text-lg">{candidate.name}</h4>
                 <p><strong>Area:</strong> {candidate.area}</p>
                 <p><strong>Criminal Cases:</strong> {candidate.crimminalCase || 'None'}</p>
@@ -103,6 +104,7 @@ export default function VoterDashboard() {
           View Election Results
         </button>
       )}
+      </div>
     </div>
   );
 }

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 export default function ResultsDashboard({ role }) {
   const [area, setArea] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const fetchResults = async () => {
     try {
@@ -29,7 +31,14 @@ export default function ResultsDashboard({ role }) {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
+      <button
+        className="mb-4 bg-gray-700 text-white px-4 py-2 rounded"
+        onClick={() => navigate(`/${role === 'head' ? 'Head' : 'Admin'}/dashboard`)}
+      >
+         Back to Dashboard
+      </button>
       <h2 className="text-2xl font-bold mb-4">{role === 'head' ? 'Head' : 'Admin'} Result Panel</h2>
+      
       
       <div className="flex items-center mb-4">
         <input
