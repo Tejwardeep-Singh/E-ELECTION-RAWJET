@@ -40,30 +40,30 @@ export default function HeadLogin() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center font-sans">
       <div className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-md border border-blue-100">
-        <h2 className="text-2xl font-bold text-blue mb-6 text-center">Head Login</h2>
+        <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">Head Login</h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="userId" className="block mb-1 text-sm font-medium text-blue">User ID</label>
+            <label htmlFor="userId" className="block mb-1 text-sm font-medium text-blue-600">User ID</label>
             <input
               type="text"
               name="userId"
               value={formData.userId}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-blue-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block mb-1 text-sm font-medium text-blue">Password</label>
+            <label htmlFor="password" className="block mb-1 text-sm font-medium text-blue-600">Password</label>
             <input
               type="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-blue-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 

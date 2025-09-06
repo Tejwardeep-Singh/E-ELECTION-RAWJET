@@ -23,30 +23,39 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className='min-h-screen bg-gray-50 flex items-center justify-center font-sans'>
-      <div className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-md border border-blue-100">
-      <form onSubmit={handleSubmit} className="p-6 bg-white  rounded-2xl w-96 space-y-6">
-        <h2 className="text-xl font-bold text-center text-blue">Admin Login</h2>
-        <input
-          name="userId"
-          value={formData.userId}
-          onChange={handleChange}
-          placeholder="User ID"
-          required
-          className="w-full border px-3 py-2 rounded text-center text-blue"
-        />
-        <input
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange}
-          placeholder="Password"
-          required
-          className="w-full border px-3 py-2 rounded text-center text-blue "
-        />
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded text-center">Login</button>
-      </form>
-    </div>
-    </div>
+    <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center font-sans overflow-hidden">
+  <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md border border-blue-100">
+    <form
+      onSubmit={handleSubmit}
+      className="p-6 bg-white rounded-2xl w-full max-w-sm space-y-6"
+    >
+      <h2 className="text-xl font-bold text-center text-blue-600">Admin Login</h2>
+      <input
+        name="userId"
+        value={formData.userId}
+        onChange={handleChange}
+        placeholder="User ID"
+        required
+        className="w-full border px-3 py-2 rounded text-center text-blue-600"
+      />
+      <input
+        name="password"
+        type="password"
+        value={formData.password}
+        onChange={handleChange}
+        placeholder="Password"
+        required
+        className="w-full border px-3 py-2 rounded text-center text-blue-600"
+      />
+      <button
+        type="submit"
+        className="w-full bg-blue-600 text-white py-2 rounded text-center"
+      >
+        Login
+      </button>
+    </form>
+  </div>
+</div>
+
   );
 }
