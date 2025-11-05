@@ -38,8 +38,8 @@ export default function HeadLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center font-sans">
-      <div className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-md border border-blue-100">
+    <div className=" main min-h-screen bg-gray-50 flex items-center justify-center font-sans">
+      <div className="bg-white shadow-lg rounded-2xl p-10 w-full max-w-md border border-blue-200">
         <h2 className="text-2xl font-bold text-blue-600 mb-6 text-center">Head Login</h2>
 
         <form onSubmit={handleSubmit} className="space-y-5">

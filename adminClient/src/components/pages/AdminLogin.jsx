@@ -23,8 +23,8 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center font-sans overflow-hidden">
-  <div className="bg-white shadow-lg rounded-2xl p-6 w-full max-w-md border border-blue-100">
+    <div className=" main min-h-screen w-full bg-gray-50 flex items-center justify-center font-sans overflow-hidden">
+  <div className="bg-white shadow-xl rounded-2xl p-6 w-full max-w-md border border-blue-500">
     <form
       onSubmit={handleSubmit}
       className="p-6 bg-white rounded-2xl w-full max-w-sm space-y-6"

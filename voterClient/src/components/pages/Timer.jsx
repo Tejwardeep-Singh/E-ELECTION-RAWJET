@@ -36,7 +36,7 @@ const CountdownTimer = ({ onElectionEnd }) => {
     <div className="text-center text-lg font-bold text-red-700 mt-4">
       {timeLeft !== null ? (
         timeLeft === 0 ? (
-          "🟢 Election is not live now!"
+          "🔴 Election is not live now!"
         ) : (
           `⏳ Time left: ${formatTime(timeLeft)}`
         )

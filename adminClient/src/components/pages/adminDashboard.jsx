@@ -8,7 +8,7 @@ export default function AdminDashboard() {
   const handleNavigate = (path) => navigate(path);
 
   return (
-    <div className="min-h-screen p-6 bg-white">
+    <div className=" main min-h-screen p-6 bg-white">
       <div className='max-w-4xl mx-auto bg-gray-600 shadow-2xl rounded-2xl p-8 border border-blue-100 py-20'>
         <h2 className="text-2xl font-bold mb-6 text-center text-white">Admin Dashboard</h2>
 

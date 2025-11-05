@@ -9,7 +9,7 @@ export default function HeadDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-white-100 py-12 px-6 font-sans">
+    <div className=" main min-h-screen bg-white-100 py-12 px-6 font-sans">
       <div className="max-w-4xl mx-auto bg-gray-600 shadow-2xl rounded-2xl p-8 border border-blue-100">
         <h1 className="text-3xl font-bold text-gray-100 mb-6 text-center">Head Dashboard</h1>
 
