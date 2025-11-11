@@ -5,7 +5,7 @@ export default function HeadDashboard() {
   const navigate = useNavigate();
 
   const handleNavigate = (path) => {
-    navigate(path); // Set up routes later for each path
+    navigate(path); 
   };
 
   return (
@@ -60,12 +60,16 @@ export default function HeadDashboard() {
           </button>
           <button
             onClick={async () => {
+              const c1 = window.confirm("⚠️ Are you sure you want to make results visible?");
+              if (!c1) return;
+
+              const c2 = window.confirm("✅ This action cannot be undone. Proceed?");
+              if (!c2) return;
+
               try {
                 const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/head/show-results`, {
                   method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
+                  headers: { 'Content-Type': 'application/json' },
                 });
 
                 const data = await res.json();
@@ -85,15 +89,18 @@ export default function HeadDashboard() {
           </button>
           <button
             onClick={async () => {
-              if (!window.confirm('⚠️ Are you sure you want to reset the election? This will delete all candidates and reset voters.')) return;
+              const c1 = window.confirm("⚠️ Are you sure you want to RESET the election?");
+              if (!c1) return;
+
+              const c2 = window.confirm("❗ This will DELETE ALL CANDIDATES & RESET ALL VOTERS. Continue?");
+              if (!c2) return;
 
               try {
                 const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/head/reset-election`, {
                   method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
+                  headers: { 'Content-Type': 'application/json' },
                 });
+
                 const data = await res.json();
                 if (res.ok) {
                   alert('✅ Election reset successfully!');
@@ -109,6 +116,7 @@ export default function HeadDashboard() {
           >
             🔄 Reset Election
           </button>
+
         </div>
       </div>
     </div>

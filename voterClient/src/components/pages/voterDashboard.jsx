@@ -51,7 +51,7 @@ export default function VoterDashboard() {
   };
 
   return (
-    <div className="w-full h-auto max-w-4xl mx-auto bg-white p-10">
+    <div className=" main w-full h-screen w-full mx-auto  p-10">
       <div className='h-screen/2 p-10 bg-gray-600 rounded-lg'>
         <h2 className="text-2xl font-bold mb-4 text-white">Welcome to Voter Dashboard</h2>
 

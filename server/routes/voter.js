@@ -64,7 +64,7 @@ router.post('/login', async (req, res) => {
     }
   }
   
-  // ✅ 1. Get voter details (Dashboard)
+
   router.get('/me', authenticateVoter, async (req, res) => {
     try {
       const voter = await Voter.findById(req.voterId).select('-password');
@@ -76,7 +76,7 @@ router.post('/login', async (req, res) => {
     }
   });
   
-  // ✅ 2. Cast vote
+
   router.post('/vote/:candidateId', authenticateVoter, async (req, res) => {
     try {
       const voter = await Voter.findById(req.voterId);

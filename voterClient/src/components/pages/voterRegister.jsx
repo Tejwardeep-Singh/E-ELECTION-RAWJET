@@ -31,7 +31,7 @@ export default function RegisterVoter() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6">
+    <div className=" main max-w-md mx-auto p-6">
       <h2 className="text-xl font-bold mb-4">Register as Voter</h2>
       <form onSubmit={handleSubmit} className="space-y-3">
         <input name="epicNumber" type="number" placeholder="EPIC Number" required className="w-full border p-2 rounded" onChange={handleChange} />

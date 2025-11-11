@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
 .main{
-    background:url(https://img.freepik.com/premium-vector/abstract-background-with-patterns-lines-gray-colors_444390-20031.jpg);
+    background:url(../public/bg.jpg);
+    background-position:center;
+    background-size: cover;
 }
 #e
 {
