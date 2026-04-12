@@ -6,21 +6,37 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const PORT = process.env.PORT || 3000;
 
-// Connect to DB
+
 require("./config/mongooseConnection");
 
-// ✅ Correct CORS (only once and before routes)
+
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:5174','https://voterrawjet.onrender.com','https://adminrawjet.onrender.com'],
   credentials: true
 }));
 
-// Middleware
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Routes
+console.log("⏳ Connecting to MongoDB...");
+mongoose.connect(process.env.MONGO_URI, {
+  dbName: "E-Election",
+  serverSelectionTimeoutMS: 5000
+}).then(() => {
+  console.log(" MongoDB Connected Successfully 🚀");
+
+  // Start server ONLY NOW ✔
+  app.listen(PORT, () => {
+    console.log(` Server running on PORT ${PORT}`);
+  });
+
+}).catch((err) => {
+  console.error(" MongoDB Connection Error:", err);
+});
+
+
 const headLoginRoutes = require("./routes/headLogin");
 const adminLoginRoutes = require("./routes/adminLogin");
 const adminRoute = require("./routes/admin");
@@ -43,6 +59,4 @@ app.use("/api/results",resultsRouter);
 // });
 // Start server
 
-app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
-});
+

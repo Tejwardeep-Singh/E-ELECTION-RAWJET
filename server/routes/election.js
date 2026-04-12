@@ -39,8 +39,6 @@ router.get('/status', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-
 // Get election config
 router.get('/get', async (req, res) => {
   try {
@@ -50,8 +48,6 @@ router.get('/get', async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch election timings' });
   }
 });
-
-
 router.get('/timer', async (req, res) => {
   try {
     const config = await ElectionConfig.findOne();
@@ -82,6 +78,4 @@ router.get('/timer', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-
 module.exports = router;

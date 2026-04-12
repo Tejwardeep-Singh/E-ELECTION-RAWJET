@@ -45,26 +45,20 @@ router.get('/candidates/:area', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
 router.get("/view", async (req, res) => {
   const admins = await Admin.find();
   res.json(admins);
 });
-
-
 router.delete("/delete/:id", async (req, res) => {
   await Admin.findByIdAndDelete(req.params.id);
   res.sendStatus(204);
 });
-
-
 router.put("/edit/:id", async (req, res) => {
   const { userId, name, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
   await Admin.findByIdAndUpdate(req.params.id, { userId, name, password: hashedPassword });
   res.sendStatus(200);
 });
-
 router.get('/election', async (req, res) => {
   try {
     const config = await electionConfig.findOne();
@@ -74,10 +68,6 @@ router.get('/election', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
-
-
-
 router.post('/reset-election', async (req, res) => {
   try {
     
@@ -96,7 +86,6 @@ router.post('/reset-election', async (req, res) => {
     res.status(500).json({ message: 'Server error during reset' });
   }
 });
-
 router.post('/set', async (req, res) => {
   try {
     const { startTime, endTime } = req.body;
@@ -127,10 +116,6 @@ router.post('/set', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
-
-
-
 router.post('/show-results', async (req, res) => {
   try {
     const config = await electionConfig.findOne();
@@ -145,7 +130,5 @@ router.post('/show-results', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
-
 module.exports = router;
 

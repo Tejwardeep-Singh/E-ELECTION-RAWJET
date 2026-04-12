@@ -33,7 +33,6 @@ router.post('/register', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-
 router.post('/login', async (req, res) => {
     const { userId, password } = req.body;
   
@@ -63,8 +62,6 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid token' });
     }
   }
-  
-
   router.get('/me', authenticateVoter, async (req, res) => {
     try {
       const voter = await Voter.findById(req.voterId).select('-password');
@@ -75,8 +72,6 @@ router.post('/login', async (req, res) => {
       res.status(500).json({ message: 'Server error' });
     }
   });
-  
-
   router.post('/vote/:candidateId', authenticateVoter, async (req, res) => {
     try {
       const voter = await Voter.findById(req.voterId);

@@ -56,7 +56,6 @@ router.get('/candidate/view', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 // Edit candidate
 router.put('/candidate/edit/:id', upload.single('candidateImage'), async (req, res) => {
   try {
@@ -81,7 +80,6 @@ router.put('/candidate/edit/:id', upload.single('candidateImage'), async (req, r
     res.status(500).json({ error: err.message });
   }
 });
-
 // Delete candidate
 router.delete('/candidate/delete/:id', async (req, res) => {
   try {
@@ -91,5 +89,4 @@ router.delete('/candidate/delete/:id', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
 module.exports = router;
