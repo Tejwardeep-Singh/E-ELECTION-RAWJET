@@ -1,12 +1,23 @@
-### 🚀 E-Voting System
-🗳️ Secure • Transparent • Scalable Online Election Platform
+<p align="center">
+  <img src="/screenshots/banner.png" alt="E-Voting System Banner" width="100%" />
+</p>
 
-### Live
+<h1 align="center">🗳️ E-Voting System</h1>
 
-- Admin Panel - https://adminrawjet.onrender.com/
-- Voter Panel - https://voterrawjet.onrender.com/ 
+<p align="center">
+  Secure • Transparent • Scalable Online Election Platform
+</p>
+<p align="center">
+  <img src="https://img.shields.io/github/stars/Tejwardeep-Singh/E-ELECTION-RAWJET?style=for-the-badge" />
+  <img src="https://img.shields.io/github/forks/Tejwardeep-Singh/E-ELECTION-RAWJET?style=for-the-badge" />
+  <img src="https://img.shields.io/github/issues/Tejwardeep-Singh/E-ELECTION-RAWJET?style=for-the-badge" />
+</p>
+<p align="center">
+  <a href="https://adminrawjet.onrender.com/">🔗 Admin Live</a> •
+  <a href="https://voterrawjet.onrender.com/">🔗 Voter Live</a>
+</p>
 
-### 📌 Overview
+## 📌 Overview
 
 A full-stack E-Voting System designed to conduct elections securely and efficiently in a digital environment.
 
@@ -16,14 +27,18 @@ This platform ensures:
 - 🔐 Secure authentication system
 - 📊 Real-time result tracking
 - 🧑‍💼 Dedicated admin panel
-- ✨ Features
-- 👨‍💼 Admin Panel
+
+
+## ✨ Features
+
+###  👨‍💼 Admin Panel
 - 🔐 Admin Login Authentication
 - ➕ Add Candidates (with images)
 - ✏️ Edit Candidate Details
 - ❌ Delete Candidates
 - 📊 View Voting Results
-- 🧑‍🤝‍🧑 Voter Panel
+
+### 🧑‍🤝‍🧑 Voter Panel
 - 📝 User Registration & Login
 - 🗳️ Cast Vote (only once)
 - 🔒 Duplicate vote prevention
@@ -48,50 +63,60 @@ This platform ensures:
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge)
 
 
-### 📂 Project Structure
+## 📂 Project Structure
 E-Voting-System/
 │
-├── client/              # React Frontend
-├── server/              # Node + Express Backend
-├── screenshots/         # Project images
+├── client/ # React Frontend
+├── server/ # Backend
+├── screenshots/
 └── README.md
 
 
-### ⚙️ Installation
+## ⚙️ Installation
 
-1️⃣ Clone Repository
-git clone https://github.com/Tejwardeep-Singh/E-ELECTION-RAWJET
-cd e-voting-system
-2️⃣ Backend Setup
+### 1️⃣ Clone Repository
+```bash
+ git clone https://github.com/Tejwardeep-Singh/E-ELECTION-RAWJET
+ cd e-voting-system
+```
+### 2️⃣ Backend Setup
+``` bash
 cd server
 npm install
 npm start
-3️⃣ Frontend Setup
+```
+
+### 3️⃣ Frontend Setup
+``` bash
 cd client
 npm install
 npm start
-🔐 Environment Variables
+```
 
-Create .env in server/:
+### 🔐 Environment Variables
 
+Create a `.env` file in `server/`:
+
+```env
 MONGO_URI=your_mongodb_connection
 JWT_SECRET=your_secret_key
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
+```
 
 
-### 📸 Screenshots
+## 📸 Screenshots
 
-🔐 Home Page
-<img src="/screenshots/home.png" width="700"/>
-📊 Admin Dashboard
-<img src="/screenshots/admin.png" width="700"/>
-🗳️ Voting Interface
-<img src="/screenshots/voter.png" width="700"/>
+- 🔐 Home Page
+<img src="/screenshots/home.png" width="100%"/>
+- 📊 Admin Dashboard
+<img src="/screenshots/admin.png" width="100%"/>
+- 🗳️ Voting Interface
+<img src="/screenshots/voter.png" width="100%"/>
 
 
-### 🚧 Future Improvements
+## 🚧 Future Improvements
 
 - 🔐 Aadhaar / Face Verification
 - 📱 Mobile App Version
@@ -99,14 +124,16 @@ CLOUDINARY_API_SECRET=your_api_secret
 - ⛓️ Blockchain Voting Integration
 - 🤝 Contributing
 
-Contributions are welcome!
-Fork the repo and submit a pull request 🚀
+## 🤝 Contributing
 
-### 📜 License
+- Contributions are welcome!  
+- Fork the repo and submit a pull request 🚀
 
-This project is licensed under the MIT License.
+## 📜 License
 
-### ⭐ Support
+- This project is licensed under the MIT License.
+
+## ⭐ Support
 
 If you like this project:
 
@@ -115,8 +142,8 @@ If you like this project:
 - 📢 Share it
 
 
-### 👨‍💻 Author
+## 👨‍💻 Author
 
-Tejwardeep Singh
-🎓 B.Tech CSE (2024–2028)
-💻 Aspiring Software Engineer
+- Tejwardeep Singh
+- 🎓 B.Tech CSE (2024–2028)
+- 💻 Aspiring Software Engineer
