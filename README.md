@@ -1,149 +1,234 @@
 <p align="center">
-  <img src="/screenshots/banner.png" alt="E-Voting System Banner" width="100%" />
+  <img src="/screenshots/banner.png" alt="BharatBallot Banner" width="100%" />
 </p>
 
-<h1 align="center">🗳️ E-Voting System</h1>
+<h1 align="center">🗳️ BharatBallot</h1>
 
 <p align="center">
-  Secure • Transparent • Scalable Online Election Platform
+  Secure Digital Election Platform for Modern Democracy
 </p>
+
+<p align="center">
+  Empowering Democracy Digitally 🇮🇳
+</p>
+
 <p align="center">
   <img src="https://img.shields.io/github/stars/Tejwardeep-Singh/E-ELECTION-RAWJET?style=for-the-badge" />
   <img src="https://img.shields.io/github/forks/Tejwardeep-Singh/E-ELECTION-RAWJET?style=for-the-badge" />
   <img src="https://img.shields.io/github/issues/Tejwardeep-Singh/E-ELECTION-RAWJET?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge" />
 </p>
+
 <p align="center">
-  <a href="https://adminrawjet.onrender.com/">🔗 Admin Live</a> •
-  <a href="https://voterrawjet.onrender.com/">🔗 Voter Live</a>
+  <a href="https://adminrawjet.onrender.com/">🔗 Admin Portal</a> •
+  <a href="https://voterrawjet.onrender.com/">🔗 Voter Portal</a>
 </p>
 
-## 📌 Overview
+---
 
-A full-stack E-Voting System designed to conduct elections securely and efficiently in a digital environment.
+# 📌 Overview
 
-This platform ensures:
+BharatBallot is a full-stack digital election platform built to provide a secure, transparent, and scalable online voting experience.
 
-- ✅ One person can vote only once
-- 🔐 Secure authentication system
-- 📊 Real-time result tracking
-- 🧑‍💼 Dedicated admin panel
+The system modernizes election workflows through secure authentication, real-time vote monitoring, and dedicated administrative controls while maintaining a clean and citizen-friendly user experience.
 
+This project is inspired by modern civic-tech and government digital infrastructure platforms.
 
-## ✨ Features
+---
 
-###  👨‍💼 Admin Panel
-- 🔐 Admin Login Authentication
-- ➕ Add Candidates (with images)
-- ✏️ Edit Candidate Details
-- ❌ Delete Candidates
-- 📊 View Voting Results
+# ✨ Core Features
 
-### 🧑‍🤝‍🧑 Voter Panel
-- 📝 User Registration & Login
-- 🗳️ Cast Vote (only once)
-- 🔒 Duplicate vote prevention
-- 👀 View candidate details
+## 🧑‍💼 Admin Portal
 
-## 🛠️ Tech Stack  
+* 🔐 Secure Admin Authentication
+* ➕ Add & Manage Candidates
+* ✏️ Update Candidate Information
+* ❌ Remove Candidates
+* 📊 Real-Time Election Monitoring
+* 📈 Result Analytics Dashboard
+* 🖼️ Candidate & Party Image Uploads
 
-### 🚀 Frontend
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+---
+
+## 🧑‍🤝‍🧑 Voter Portal
+
+* 📝 Voter Registration & Login
+* 🗳️ Secure Vote Casting
+* 🔒 One Person, One Vote System
+* 👀 Candidate Information Access
+* ✅ Vote Confirmation System
+
+---
+
+## 🔐 Security Features
+
+* JWT-based Authentication
+* Protected Routes & Access Control
+* Duplicate Vote Prevention
+* Secure Session Management
+* Cloud-based Media Storage
+* Input Validation & Verification
+
+---
+
+# 🛠️ Tech Stack
+
+## 🚀 Frontend
+
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge\&logo=react\&logoColor=61DAFB)
+![TailwindCSS](https://img.shields.io/badge/TailwindCSS-38BDF8?style=for-the-badge\&logo=tailwindcss\&logoColor=white)
 ![Axios](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge)
 
-### ⚙️ Backend
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+---
 
-### 🗄️ Database
-![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
+## ⚙️ Backend
 
-### ☁️ Cloud & Tools
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge\&logo=nodedotjs\&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge\&logo=express\&logoColor=white)
+
+---
+
+## 🗄️ Database
+
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge\&logo=mongodb\&logoColor=white)
+
+---
+
+## ☁️ Cloud & Tools
+
 ![Cloudinary](https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge)
-![Multer](https://img.shields.io/badge/Multer-FF6C37?style=for-the-badge)
 ![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge)
+![Multer](https://img.shields.io/badge/Multer-FF6C37?style=for-the-badge)
 
+---
 
-## 📂 Project Structure
-E-Voting-System/
-│
-├── client/ # React Frontend
-├── server/ # Backend
-├── screenshots/
-└── README.md
+# 📂 Project Structure
 
-
-## ⚙️ Installation
-
-### 1️⃣ Clone Repository
 ```bash
- git clone https://github.com/Tejwardeep-Singh/E-ELECTION-RAWJET
- cd e-voting-system
+BharatBallot/
+│
+├── client/          # React Frontend
+├── server/          # Backend & APIs
+├── screenshots/     # UI Screenshots
+└── README.md
 ```
-### 2️⃣ Backend Setup
-``` bash
+
+---
+
+# ⚙️ Installation & Setup
+
+## 1️⃣ Clone Repository
+
+```bash
+git clone https://github.com/Tejwardeep-Singh/E-ELECTION-RAWJET.git
+
+cd E-ELECTION-RAWJET
+```
+
+---
+
+## 2️⃣ Backend Setup
+
+```bash
 cd server
+
 npm install
+
 npm start
 ```
 
-### 3️⃣ Frontend Setup
-``` bash
+---
+
+## 3️⃣ Frontend Setup
+
+```bash
 cd client
+
 npm install
+
 npm start
 ```
 
-### 🔐 Environment Variables
+---
 
-Create a `.env` file in `server/`:
+# 🔐 Environment Variables
+
+Create a `.env` file inside the `server/` directory.
 
 ```env
 MONGO_URI=your_mongodb_connection
+
 JWT_SECRET=your_secret_key
+
 CLOUDINARY_CLOUD_NAME=your_cloud_name
+
 CLOUDINARY_API_KEY=your_api_key
+
 CLOUDINARY_API_SECRET=your_api_secret
 ```
 
+---
 
-## 📸 Screenshots
+# 📸 Screenshots
 
-- 🔐 Home Page
+## 🏠 Home Page
+
 <img src="/screenshots/home.png" width="100%"/>
-- 📊 Admin Dashboard
+
+---
+
+## 📊 Admin Dashboard
+
 <img src="/screenshots/admin.png" width="100%"/>
-- 🗳️ Voting Interface
+
+---
+
+## 🗳️ Voting Interface
+
 <img src="/screenshots/voter.png" width="100%"/>
 
+---
 
-## 🚧 Future Improvements
+# 🚀 Future Improvements
 
-- 🔐 Aadhaar / Face Verification
-- 📱 Mobile App Version
-- 🌐 Live Deployment with HTTPS
-- ⛓️ Blockchain Voting Integration
-- 🤝 Contributing
+* 🔐 Aadhaar Verification Integration
+* 📱 Mobile Application
+* 🌐 HTTPS & Production Deployment
+* 📡 Real-Time Socket Integration
+* ⛓️ Blockchain-based Vote Verification
+* 📊 Advanced Election Analytics
+* 🧠 AI-Based Fraud Detection
 
-## 🤝 Contributing
+---
 
-- Contributions are welcome!  
-- Fork the repo and submit a pull request 🚀
+# 🤝 Contributing
 
-## 📜 License
+Contributions are welcome.
 
-- This project is licensed under the MIT License.
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Open a Pull Request 🚀
 
-## ⭐ Support
+---
 
-If you like this project:
+# 📜 License
 
-- ⭐ Star this repo
-- 🍴 Fork it
-- 📢 Share it
+This project is licensed under the MIT License.
 
+---
 
-## 👨‍💻 Author
+# ⭐ Support
 
-- Tejwardeep Singh
-- 🎓 B.Tech CSE (2024–2028)
-- 💻 Aspiring Software Engineer
+If you found this project useful:
+
+* ⭐ Star the repository
+* 🍴 Fork the project
+* 📢 Share it with others
+
+---
+
+# 👨‍💻 Author
+
+### Tejwardeep Singh
+
