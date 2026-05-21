@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="/screenshots/banner.png" alt="BharatBallot Banner" width="100%" />
+  <img src="/screenshots/banner2.png" alt="BharatBallot Banner" width="100%" />
 </p>
 
 <h1 align="center">🗳️ BharatBallot</h1>
