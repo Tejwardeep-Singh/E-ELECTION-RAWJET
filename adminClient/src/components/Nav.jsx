@@ -6,36 +6,35 @@ export default function Nav() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
 
-  // Helper function to check active path for premium visual underline anchors
+  // Helper function to dynamically track active path highlighting
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-white/75 backdrop-blur-md border-b border-slate-200/80 px-6 py-3.5 md:px-12 font-sans select-none transition-all duration-300">
+    <nav className="sticky top-0 z-50 w-full bg-white/75 backdrop-blur-md border-b border-slate-200/60 px-6 py-3.5 md:px-12 font-sans select-none transition-all duration-300">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         
-        {/* --- LEFT: Brand Identity --- */}
+        {/* --- LEFT: BharatBallot Identity --- */}
         <div className="flex items-center space-x-3 group cursor-pointer">
-          <div className="w-9 h-9 bg-gradient-to-b from-blue-800 to-blue-950 rounded-xl flex items-center justify-center text-white font-serif font-bold text-lg shadow-sm shadow-blue-950/10 transform group-hover:scale-[1.02] transition-transform duration-200">
-            {/* If you want to use logo.png, just replace the 'E' below with your img tag */}
-            <span>E</span>
+          <div className="w-9 h-9 bg-gradient-to-tr from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center text-white font-serif font-black text-lg shadow-sm shadow-blue-600/10 transform group-hover:scale-[1.01] transition-transform duration-200">
+            <span>B</span>
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-black tracking-wider text-slate-900 uppercase leading-none mb-0.5">
-              Admin Panel
+            <span className="text-sm font-black tracking-tight text-slate-900 font-display leading-none mb-0.5">
+              Bharat<span className="bg-gradient-to-r from-orange-500 via-amber-500 to-emerald-600 bg-clip-text text-transparent">Ballot</span>
             </span>
-            <span className="text-[10px] font-bold tracking-widest text-blue-800 uppercase opacity-80 leading-none">
-              Election Systems
+            <span className="text-[9px] font-bold tracking-widest text-slate-400 uppercase leading-none">
+              Secure Election Portal
             </span>
           </div>
         </div>
 
-        {/* --- CENTER/RIGHT: Desktop Navigation --- */}
+        {/* --- CENTER/RIGHT: Desktop Civic Navigation --- */}
         <ul className="hidden md:flex items-center space-x-1 text-xs font-bold uppercase tracking-wider text-slate-500">
           <li>
             <Link 
               to="/" 
-              className={`px-4 py-2 rounded-lg transition-all duration-200 hover:text-slate-900 hover:bg-slate-100/60 ${
-                isActive('/') ? 'text-blue-900 bg-blue-50/60 font-extrabold' : ''
+              className={`px-4 py-2 rounded-lg transition-all duration-200 hover:text-slate-900 ${
+                isActive('/') ? 'text-blue-600 bg-blue-50/60 font-black' : 'hover:bg-slate-50'
               }`}
             >
               Home
@@ -44,8 +43,8 @@ export default function Nav() {
           <li>
             <Link 
               to="/admin" 
-              className={`px-4 py-2 rounded-lg transition-all duration-200 hover:text-slate-900 hover:bg-slate-100/60 ${
-                isActive('/admin') ? 'text-blue-900 bg-blue-50/60 font-extrabold' : ''
+              className={`px-4 py-2 rounded-lg transition-all duration-200 hover:text-slate-900 ${
+                isActive('/admin') ? 'text-blue-600 bg-blue-50/60 font-black' : 'hover:bg-slate-50'
               }`}
             >
               Admin
@@ -54,28 +53,28 @@ export default function Nav() {
           <li>
             <Link 
               to="/head" 
-              className={`px-4 py-2 rounded-lg transition-all duration-200 hover:text-slate-900 hover:bg-slate-100/60 ${
-                isActive('/head') ? 'text-blue-900 bg-blue-50/60 font-extrabold' : ''
+              className={`px-4 py-2 rounded-lg transition-all duration-200 hover:text-slate-900 ${
+                isActive('/head') ? 'text-blue-600 bg-blue-50/60 font-black' : 'hover:bg-slate-50'
               }`}
             >
-              Head
+              Head Panel
             </Link>
           </li>
 
-          {/* Institutional Divider */}
+          {/* Institutional Structural Divider */}
           <div className="h-4 w-[1px] bg-slate-200 mx-3" />
 
-          {/* Micro-status component inside navbar */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-100 rounded-full text-[10px] font-extrabold text-emerald-700 tracking-widest">
-            <ShieldCheck size={13} className="stroke-[2.5]" />
-            SECURE
+          {/* Civic Micro-Status Token */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 border border-emerald-100 rounded-full text-[9px] font-black text-emerald-800 tracking-widest">
+            <ShieldCheck size={12} className="stroke-[2.5] text-emerald-600" />
+            SECURE NODE
           </div>
         </ul>
 
         {/* --- RIGHT: Mobile Hamburger Action --- */}
         <button 
           onClick={() => setOpen(!open)} 
-          className="md:hidden text-slate-700 hover:text-slate-900 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+          className="md:hidden text-slate-700 hover:text-slate-900 p-1.5 rounded-lg hover:bg-slate-50 transition-colors"
           aria-label="Toggle Menu"
         >
           {open ? <X size={20} className="stroke-[2.5]" /> : <Menu size={20} className="stroke-[2.5]" />}
@@ -91,7 +90,7 @@ export default function Nav() {
                 to="/" 
                 onClick={() => setOpen(false)} 
                 className={`block w-full px-4 py-3 rounded-xl transition-colors ${
-                  isActive('/') ? 'text-blue-900 bg-blue-50 font-extrabold' : 'hover:bg-slate-50 hover:text-slate-900'
+                  isActive('/') ? 'text-blue-600 bg-blue-50 font-black' : 'hover:bg-slate-50 hover:text-slate-900'
                 }`}
               >
                 Home
@@ -102,7 +101,7 @@ export default function Nav() {
                 to="/admin" 
                 onClick={() => setOpen(false)} 
                 className={`block w-full px-4 py-3 rounded-xl transition-colors ${
-                  isActive('/admin') ? 'text-blue-900 bg-blue-50 font-extrabold' : 'hover:bg-slate-50 hover:text-slate-900'
+                  isActive('/admin') ? 'text-blue-600 bg-blue-50 font-black' : 'hover:bg-slate-50 hover:text-slate-900'
                 }`}
               >
                 Admin
@@ -113,10 +112,10 @@ export default function Nav() {
                 to="/head" 
                 onClick={() => setOpen(false)} 
                 className={`block w-full px-4 py-3 rounded-xl transition-colors ${
-                  isActive('/head') ? 'text-blue-900 bg-blue-50 font-extrabold' : 'hover:bg-slate-50 hover:text-slate-900'
+                  isActive('/head') ? 'text-blue-600 bg-blue-50 font-black' : 'hover:bg-slate-50 hover:text-slate-900'
                 }`}
               >
-                Head
+                Head Panel
               </Link>
             </li>
           </ul>
