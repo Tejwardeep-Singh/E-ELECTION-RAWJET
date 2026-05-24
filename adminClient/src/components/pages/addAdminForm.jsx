@@ -39,14 +39,14 @@ export default function AddAdminForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] font-sans flex items-center justify-center p-6 relative overflow-hidden select-none antialiased">
+    <div className="min-h-screen bg-[#F8FBFF] font-sans flex items-center justify-center p-6 relative overflow-hidden select-none antialiased">
       
       {/* Universal Structural Background Details */}
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,rgba(30,58,138,0.03),transparent_40%)] pointer-events-none" />
-      <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:6rem_6rem] opacity-20 pointer-events-none" />
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.04),transparent_40%)] pointer-events-none" />
+      <div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:6rem_6rem] opacity-30 pointer-events-none" />
 
       {/* Main Container Card */}
-      <div className="relative z-10 w-full max-w-md bg-white border border-slate-200/80 rounded-3xl p-8 md:p-10 shadow-[0_20px_50px_-12px_rgba(30,41,59,0.04)] space-y-6">
+      <div className="relative z-10 w-full max-w-md bg-white border border-slate-200/60 rounded-3xl p-8 md:p-10 shadow-[0_8px_30px_rgba(0,0,0,0.02)] backdrop-blur-md space-y-6">
         
         {/* Navigation Action Header */}
         <div className="flex items-center justify-between border-b border-slate-100 pb-4">
@@ -57,13 +57,13 @@ export default function AddAdminForm() {
             <ArrowLeft size={14} className="stroke-[2.5]" />
             Dashboard
           </button>
-          <span className="text-[10px] font-mono tracking-widest text-slate-300">SECURE_NODE</span>
+          <span className="text-[10px] font-mono tracking-widest text-slate-300 font-bold">SECURE_NODE</span>
         </div>
 
         {/* Title Presentation */}
         <div>
-          <h2 className="text-2xl font-black tracking-tight text-slate-900">Add New Admin</h2>
-          <p className="text-xs font-medium text-slate-400 mt-0.5 uppercase tracking-wider">Create Coordinator Profile Credentials</p>
+          <h2 className="text-2xl font-black tracking-tight text-[#0F172A] font-display">Add New Admin</h2>
+          <p className="text-xs font-semibold text-[#64748B] mt-0.5 uppercase tracking-wider">Create Coordinator Profile Credentials</p>
         </div>
 
         {/* Dynamic Server Feedback Notification Banner */}
@@ -87,7 +87,7 @@ export default function AddAdminForm() {
           
           {/* Input 1: Admin User ID */}
           <div className="space-y-1.5">
-            <label htmlFor="userId" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            <label htmlFor="userId" className="block text-[11px] font-bold uppercase tracking-wider text-[#64748B]">
               Admin User ID
             </label>
             <div className="relative">
@@ -102,14 +102,14 @@ export default function AddAdminForm() {
                 value={formData.userId}
                 onChange={handleChange}
                 required
-                className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl focus:outline-none focus:border-blue-900 focus:bg-white focus:ring-4 focus:ring-blue-900/5 transition-all placeholder:text-slate-400/70"
+                className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-slate-400/70 font-mono tracking-wide uppercase"
               />
             </div>
           </div>
 
           {/* Input 2: Admin Full Name */}
           <div className="space-y-1.5">
-            <label htmlFor="name" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            <label htmlFor="name" className="block text-[11px] font-bold uppercase tracking-wider text-[#64748B]">
               Admin Full Name
             </label>
             <div className="relative">
@@ -124,14 +124,14 @@ export default function AddAdminForm() {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl focus:outline-none focus:border-blue-900 focus:bg-white focus:ring-4 focus:ring-blue-900/5 transition-all placeholder:text-slate-400/70"
+                className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-slate-400/70"
               />
             </div>
           </div>
 
           {/* Input 3: Admin Security Password */}
           <div className="space-y-1.5">
-            <label htmlFor="password" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
+            <label htmlFor="password" className="block text-[11px] font-bold uppercase tracking-wider text-[#64748B]">
               Security Password
             </label>
             <div className="relative">
@@ -146,7 +146,7 @@ export default function AddAdminForm() {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full pl-11 pr-11 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl focus:outline-none focus:border-blue-900 focus:bg-white focus:ring-4 focus:ring-blue-900/5 transition-all placeholder:text-slate-400/70 tracking-widest font-mono"
+                className="w-full pl-11 pr-11 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-slate-400/70 tracking-widest font-mono"
               />
               <button
                 type="button"
@@ -162,7 +162,7 @@ export default function AddAdminForm() {
           <div className="pt-3">
             <button
               type="submit"
-              className="w-full bg-gradient-to-b from-blue-800 to-blue-950 text-white py-2.5 px-4 rounded-l text-xs font-bold uppercase tracking-wider hover:from-blue-900 hover:to-slate-950 active:scale-[0.99] shadow-md shadow-blue-950/5 transition-all duration-150"
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold text-sm rounded-xl py-2.5 px-4 shadow-sm shadow-blue-600/10 active:scale-[0.99] transition-all uppercase tracking-wider font-display"
             >
               Provision Admin Profile
             </button>
