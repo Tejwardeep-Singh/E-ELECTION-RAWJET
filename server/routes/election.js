@@ -50,32 +50,70 @@ router.get('/get', async (req, res) => {
 });
 router.get('/timer', async (req, res) => {
   try {
+
     const config = await ElectionConfig.findOne();
-    if (!config) return res.status(404).json({ message: 'Election config not found' });
+
+    if (!config) {
+      return res.status(404).json({
+        message: 'Election config not found'
+      });
+    }
 
     const now = moment().tz('Asia/Kolkata');
+
     const startTime = moment.tz(config.startTime, 'Asia/Kolkata');
+
     const endTime = moment.tz(config.endTime, 'Asia/Kolkata');
 
-    const timeRemaining = Math.max(0, endTime.diff(now));
-    const isOver = timeRemaining === 0;
     const electionLive = now.isBetween(startTime, endTime);
 
-    // 🔁 Automatically update DB if election is over and resultVisible is still false
+    const timeRemaining = electionLive
+      ? Math.max(0, endTime.diff(now))
+      : 0;
+
+    let status = 'reset';
+
+if (config.resultVisible) {
+
+  status = 'resultLive';
+
+} else if (electionLive) {
+
+  status = 'live';
+
+} else if (now.isBefore(startTime)) {
+
+  status = 'upcoming';
+
+} else if (now.isAfter(endTime)) {
+
+  status = 'ended';
+
+}
+
+    // Auto update
     if (now.isAfter(endTime) && !config.resultVisible) {
       config.electionLive = false;
       await config.save();
     }
 
     res.json({
+      status,
       timeRemaining,
       electionLive,
       resultVisible: config.resultVisible,
-      isOver
+      startTime: config.startTime,
+      endTime: config.endTime
     });
+
   } catch (err) {
+
     console.error(err);
-    res.status(500).json({ message: 'Server error' });
+
+    res.status(500).json({
+      message: 'Server error'
+    });
+
   }
 });
 module.exports = router;
