@@ -53,7 +53,7 @@ export default function Nav() {
         </ul>
 
         {/* --- MOBILE HAMBURGER TRIGGER BUTTON --- */}
-        <button 
+        <button  
           onClick={() => setOpen(!open)} 
           className="md:hidden p-1.5 text-[#0F172A] bg-slate-50 border border-slate-200/60 rounded-lg hover:bg-slate-100 active:scale-95 transition-all"
           aria-label="Toggle Navigation Menu"
