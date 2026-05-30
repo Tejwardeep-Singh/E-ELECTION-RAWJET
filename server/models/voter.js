@@ -33,5 +33,8 @@ const voterSchema = mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    photo: {
+        type: String
+    }
 });
 module.exports = mongoose.model("voter",voterSchema);
