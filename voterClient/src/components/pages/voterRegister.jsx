@@ -13,6 +13,7 @@ export default function RegisterVoter() {
     state: '',
     password: ''
   });
+  const [photo, setPhoto] = useState(null);
 
   const [statusMessage, setStatusMessage] = useState({ isOpen: false, type: 'success', text: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -22,32 +23,67 @@ export default function RegisterVoter() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async e => {
-    e.preventDefault();
-    setStatusMessage({ isOpen: false, type: 'success', text: '' });
-    setIsSubmitting(true);
+  const handleSubmit = async (e) => {
 
-    try {
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/voter/register`, formData);
-      setStatusMessage({
-        isOpen: true,
-        type: 'success',
-        text: 'Registered successfully! Moving to login page...'
-      });
-      setTimeout(() => {
-        navigate('/voter/login');
-      }, 2000);
-    } catch (err) {
-      console.error(err);
-      setStatusMessage({
-        isOpen: true,
-        type: 'error',
-        text: err.response?.data?.message || 'Registration failed. Please check your details and try again.'
-      });
-      setIsSubmitting(false);
-    }
-  };
+  e.preventDefault();
 
+  setStatusMessage({
+    isOpen: false,
+    type: 'success',
+    text: ''
+  });
+
+  setIsSubmitting(true);
+
+  try {
+
+    const data = new FormData();
+
+    data.append("epicNumber", formData.epicNumber);
+    data.append("userId", formData.userId);
+    data.append("name", formData.name);
+    data.append("area", formData.area);
+    data.append("city", formData.city);
+    data.append("state", formData.state);
+    data.append("password", formData.password);
+
+    data.append("photo", photo);
+
+    await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/api/voter/register`,
+      data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }
+    );
+
+    setStatusMessage({
+      isOpen: true,
+      type: 'success',
+      text: 'Registered successfully! Moving to login page...'
+    });
+
+    setTimeout(() => {
+      navigate('/voter/login');
+    }, 2000);
+
+  } catch (err) {
+
+    console.error(err);
+
+    setStatusMessage({
+      isOpen: true,
+      type: 'error',
+      text:
+        err.response?.data?.message ||
+        'Registration failed. Please check your details and try again.'
+    });
+
+    setIsSubmitting(false);
+  }
+};
   return (
     <main className="min-h-screen bg-[#F8FBFF] font-sans flex items-center justify-center p-6 relative overflow-hidden antialiased">
       
@@ -214,6 +250,31 @@ export default function RegisterVoter() {
                   className="w-full pl-11 pr-4 py-2.5 bg-slate-50/60 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/5 transition-all"
                 />
               </div>
+            </div>
+            <div className="space-y-1.5 sm:col-span-2">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-[#64748B]">
+                Upload Profile Photo
+              </label>
+
+              <input
+                type="file"
+                accept="image/*"
+                required
+                disabled={isSubmitting}
+
+                onChange={(e) => {
+                  setPhoto(e.target.files[0]);
+                }}
+
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm"
+              />
+              {photo && (
+                <img
+                    src={URL.createObjectURL(photo)}
+                    alt="preview"
+                    className="w-32 h-32 rounded-full object-cover"
+                />
+              )}
             </div>
 
             {/* Password Input */}

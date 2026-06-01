@@ -24,7 +24,35 @@ const storage = new CloudinaryStorage({
     };
   },
 });
+const voterStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    return {
+      folder: "bharat-ballot/voters",
+      allowed_formats: ["jpg", "jpeg", "png"],
+      public_id: `voter-${Date.now()}`
+    };
+  }
+});
+const voterUpload = multer({
+  storage: voterStorage,
+
+  limits: {
+    fileSize: 2 * 1024 * 1024
+  },
+
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files allowed"), false);
+    }
+  }
+});
 
 const upload = multer({ storage });
 
-module.exports = upload;
+module.exports = {
+   upload,
+   voterUpload
+};

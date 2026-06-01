@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Candidate = require('../models/candidate');
-const upload = require("../config/cloudinaryUpload");
+const { upload } = require("../config/cloudinaryUpload");
 const multer=require("multer");
 
 // Add candidate

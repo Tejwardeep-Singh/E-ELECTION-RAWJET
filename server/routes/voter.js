@@ -5,9 +5,10 @@ const Voter = require('../models/voter');
 const Candidate = require('../models/candidate');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { voterUpload } = require("../config/cloudinaryUpload");
 
 // Register voter
-router.post('/register', async (req, res) => {
+router.post('/register',voterUpload.single('photo'), async (req, res) => {
   const { epicNumber, userId, name, area, password,city,state } = req.body;
 
   try {
@@ -24,6 +25,7 @@ router.post('/register', async (req, res) => {
       city,
       state,
       password: hashedPassword,
+      photo: req.file.path || ""
     });
 
     await newVoter.save();
