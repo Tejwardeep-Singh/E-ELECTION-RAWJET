@@ -44,9 +44,6 @@ export default function App() {
         <Route path="/admin/results" element={<ResultsDashboard role="admin" />} />
         <Route path="/head/results" element={<ResultsDashboard role="head" />} />
         <Route path="/head/candidates" element={<ViewCandidatesByArea />} />
-        
-
-
       </Routes>
       <Copywright />
     </>

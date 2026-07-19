@@ -29,7 +29,7 @@ const candidateSchema = mongoose.Schema({
         type:String,
         required:true,
     },
-    crimminalCase:{
+    criminalCase:{
         type:String,
     },
     voteCount:{

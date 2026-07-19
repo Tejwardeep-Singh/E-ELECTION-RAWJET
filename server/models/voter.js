@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const voterSchema = mongoose.Schema({
     epicNumber:{
-        type:Number,
+        type:String,
         required:true,
         unique:true,
     },
@@ -35,6 +35,14 @@ const voterSchema = mongoose.Schema({
     },
     photo: {
         type: String
-    }
+    },
+    faceEmbedding:{
+    type:[Number]
+},
+status:{
+    type:String,
+    enum:["active","inactive","suspended"],
+    default:"active"
+}
 });
 module.exports = mongoose.model("voter",voterSchema);

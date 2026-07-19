@@ -25,7 +25,7 @@ router.post('/register',voterUpload.single('photo'), async (req, res) => {
       city,
       state,
       password: hashedPassword,
-      photo: req.file.path || ""
+      photo: req.file?.path || ""
     });
 
     await newVoter.save();
@@ -109,5 +109,47 @@ router.get('/results', authenticateVoter, async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+router.put(
+  '/update-photo',
+  authenticateVoter,
+  voterUpload.single('photo'),
 
+  async (req, res) => {
+    console.log("UPDATE ROUTE HIT");
+console.log(req.headers.authorization);
+
+    try {
+
+      if (!req.file) {
+        return res.status(400).json({
+          message: "Photo is required"
+        });
+      }
+
+      const voter = await Voter.findById(req.voterId);
+
+      if (!voter) {
+        return res.status(404).json({
+          message: "Voter not found"
+        });
+      }
+
+      voter.photo = req.file.path;
+
+      await voter.save();
+
+      res.json({
+        message: "Photo updated successfully",
+        photo: voter.photo
+      });
+
+    } catch (err) {
+
+      console.error(err);
+
+      res.status(500).json({
+        message: "Server error"
+      });
+    }
+});
 module.exports = router;
