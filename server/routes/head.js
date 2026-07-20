@@ -74,7 +74,7 @@ router.post('/reset-election', async (req, res) => {
     await Candidate.deleteMany({});
 
     let config = await electionConfig.findOne();
-    await Voter.updateMany({}, { $set: { hasVoted: false } });
+    await Voter.updateMany({}, { $set: { votingStatus: 'not_voted' } });
     config.startTime = null;
       config.endTime = null;
       config.electionLive = false;  

@@ -24,9 +24,9 @@ export default function VoterDashboard() {
           headers: { Authorization: `Bearer ${token}` }
         });
         setVoter(voterRes.data);
-        setVoted(voterRes.data.hasVoted);
+        setVoted(voterRes.data.votingStatus === 'voted');
         
-        const candidatesRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/by-area/${voterRes.data.area}`);
+        const candidatesRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/by-area/${voterRes.data.address.area}`);
         setCandidates(candidatesRes.data);
       } catch (err) {
         console.error('Failed to fetch voter/candidates:', err);
@@ -88,7 +88,7 @@ export default function VoterDashboard() {
       }
 
       const formData = new FormData();
-      formData.append("photo", file);
+      formData.append("photoUrl", file);
 
       const res = await axios.put(
         `${import.meta.env.VITE_API_BASE_URL}/api/voter/update-photo`,
@@ -101,7 +101,7 @@ export default function VoterDashboard() {
         }
       );
 
-      setVoter(prev => ({ ...prev, photo: res.data.photo }));
+      setVoter(prev => ({ ...prev, photoUrl: res.data.photoUrl }));
       triggerAlert('success', 'Profile photo updated successfully.');
     } catch (err) {
       console.error(err);
@@ -140,8 +140,12 @@ export default function VoterDashboard() {
               {/* Profile Avatar Frame with Built-in Photo Update Control */}
               <div className="relative shrink-0 group">
                 <img
-                  src={voter.photo || "/default-user.png"}
+                  src={voter.photoUrl || "/default-user.png"}
                   alt="voter profile"
+                  onError={(event) => {
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = "/default-user.png";
+                  }}
                   className="w-24 h-24 rounded-full object-cover border-4 border-slate-50 shadow-sm"
                 />
                 <label className="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-xs cursor-pointer transition-colors border-2 border-white">
@@ -160,7 +164,7 @@ export default function VoterDashboard() {
                 
                 <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs font-semibold text-[#64748B]">
                   <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200/60 rounded-xl">
-                    <MapPin size={13} className="text-slate-400" /> {voter.area}
+                    <MapPin size={13} className="text-slate-400" /> {voter.address?.area}
                   </span>
                   <span className={`flex items-center gap-1.5 px-3 py-1 border rounded-xl font-bold uppercase tracking-wider text-[10px] ${
                     voted ? 'bg-emerald-50 border-emerald-100 text-emerald-800' : 'bg-amber-50 border-amber-100 text-amber-800'
@@ -194,7 +198,7 @@ export default function VoterDashboard() {
 
           {candidates.length === 0 ? (
             <div className="text-center py-12 bg-white border border-slate-200/60 rounded-2xl text-[#64748B] text-xs font-bold uppercase tracking-wider">
-              No matching candidate records indexed for constituency: {voter?.area}
+              No matching candidate records indexed for constituency: {voter?.address?.area}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

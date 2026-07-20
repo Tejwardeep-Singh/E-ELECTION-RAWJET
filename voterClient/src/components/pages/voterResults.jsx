@@ -19,7 +19,7 @@ export default function VoterResult() {
 
         if (res.data?.candidates) {
           setResults(res.data.candidates);
-          setArea(res.data.area || 'Unknown');
+          setArea(res.data.address?.area || 'Unknown');
         } else {
           setResults([]);
           setArea('Unknown');

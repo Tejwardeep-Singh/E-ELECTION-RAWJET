@@ -8,19 +8,32 @@ export default function RegisterVoter() {
     epicNumber: '',
     userId: '',
     name: '',
-    area: '',
-    city: '',
-    state: '',
+    address: {
+      area: '',
+      city: '',
+      state: '',
+    },
     password: ''
   });
-  const [photo, setPhoto] = useState(null);
+  const [photoUrl, setPhotoUrl] = useState(null);
 
   const [statusMessage, setStatusMessage] = useState({ isOpen: false, type: 'success', text: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = e => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const [group, field] = name.split('.');
+
+    if (field) {
+      setFormData((current) => ({
+        ...current,
+        [group]: { ...current[group], [field]: value },
+      }));
+      return;
+    }
+
+    setFormData((current) => ({ ...current, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -42,12 +55,10 @@ export default function RegisterVoter() {
     data.append("epicNumber", formData.epicNumber);
     data.append("userId", formData.userId);
     data.append("name", formData.name);
-    data.append("area", formData.area);
-    data.append("city", formData.city);
-    data.append("state", formData.state);
+    data.append("address", JSON.stringify(formData.address));
     data.append("password", formData.password);
 
-    data.append("photo", photo);
+    data.append("photoUrl", photoUrl);
 
     await axios.post(
       `${import.meta.env.VITE_API_BASE_URL}/api/voter/register`,
@@ -197,7 +208,7 @@ export default function RegisterVoter() {
                 </div>
                 <input
                   type="text"
-                  name="area"
+                  name="address.area"
                   id="area"
                   placeholder="Your voting area"
                   required
@@ -219,7 +230,7 @@ export default function RegisterVoter() {
                 </div>
                 <input
                   type="text"
-                  name="city"
+                  name="address.city"
                   id="city"
                   placeholder="Your city"
                   required
@@ -241,7 +252,7 @@ export default function RegisterVoter() {
                 </div>
                 <input
                   type="text"
-                  name="state"
+                  name="address.state"
                   id="state"
                   placeholder="Your state"
                   required
@@ -263,14 +274,14 @@ export default function RegisterVoter() {
                 disabled={isSubmitting}
 
                 onChange={(e) => {
-                  setPhoto(e.target.files[0]);
+                  setPhotoUrl(e.target.files[0]);
                 }}
 
                 className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm"
               />
-              {photo && (
+              {photoUrl && (
                 <img
-                    src={URL.createObjectURL(photo)}
+                    src={URL.createObjectURL(photoUrl)}
                     alt="preview"
                     className="w-32 h-32 rounded-full object-cover"
                 />
