@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserCheck, UserPlus, UserMinus, Sliders, BarChart3, ShieldCheck } from 'lucide-react';
+import { UserCheck, UserPlus, UserMinus, Sliders, BarChart3, ShieldCheck, Users } from 'lucide-react';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -116,6 +116,17 @@ export default function AdminDashboard() {
           </button>
 
           {/* Card 5: View Results */}
+          <button
+            onClick={() => handleNavigate('/admin/voters')}
+            className="group bg-white border border-slate-200/60 rounded-3xl p-6 shadow-[0_4px_25px_-4px_rgba(15,23,42,0.01)] text-left flex flex-col justify-between hover:border-blue-600 hover:shadow-[0_12px_40px_-6px_rgba(37,99,235,0.04)] transition-all duration-300 cursor-pointer"
+          >
+            <div className="space-y-4">
+              <div className="p-2.5 bg-slate-50 text-slate-600 rounded-xl w-fit group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors"><Users size={20} className="stroke-[2.2]" /></div>
+              <div className="space-y-1"><h3 className="text-base font-bold text-[#0F172A] tracking-tight group-hover:text-blue-600 transition-colors">View Voters</h3><p className="text-xs font-medium text-[#64748B] leading-relaxed">Review voter profiles registered within your assigned area.</p></div>
+            </div>
+          </button>
+
+          {/* Card 6: View Results */}
           <button 
             onClick={() => handleNavigate('/admin/results')}
             className="group bg-white border border-slate-200/60 rounded-3xl p-6 shadow-[0_4px_25px_-4px_rgba(15,23,42,0.01)] text-left flex flex-col justify-between hover:border-blue-600 hover:shadow-[0_12px_40px_-6px_rgba(37,99,235,0.04)] transition-all duration-300 cursor-pointer sm:col-span-2 lg:col-span-1"

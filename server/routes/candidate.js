@@ -6,6 +6,21 @@ const { upload } = require('../config/cloudinaryUpload');
 const authenticate = require('../middlewares/authenticate');
 const allowHeadOrAdmin = require('../middlewares/allowHeadOrAdmin');
 
+// Keep administrative voter responses deliberately allow-listed.  In
+// particular, neither credentials nor biometric templates may leave the API.
+const SAFE_VOTER_FIELDS = [
+  'epicNumber',
+  'userId',
+  'name',
+  'address',
+  'photoUrl',
+  'votingStatus',
+  'status',
+  'lastVerification',
+  'createdAt',
+  'updatedAt',
+].join(' ');
+
 const scopeFor = (req) => req.user.role === 'admin'
   ? {
       'address.state': req.admin.address.state,
@@ -87,9 +102,40 @@ router.delete('/candidate/delete/:id', async (req, res) => {
 
 router.get('/voter/view', async (req, res) => {
   try {
-    res.json(await Voter.find(scopeFor(req)).select('-password'));
+    res.json(await Voter.find(scopeFor(req)).select(SAFE_VOTER_FIELDS));
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// A voter is loaded before the jurisdiction comparison so an administrator
+// receives an explicit forbidden response when attempting to access a voter
+// outside of their assigned state, city, and area.
+router.get('/voters/:id', authenticate, allowHeadOrAdmin, async (req, res) => {
+  try {
+    const voter = await Voter.findById(req.params.id).select(SAFE_VOTER_FIELDS);
+    if (!voter) return res.status(404).json({ message: 'Voter not found' });
+
+    if (req.user.role === 'admin') {
+      const voterAddress = voter.address || {};
+      const adminAddress = req.admin.address;
+      const isAssignedArea = voterAddress.state === adminAddress.state
+        && voterAddress.city === adminAddress.city
+        && voterAddress.area === adminAddress.area;
+
+      if (!isAssignedArea) {
+        return res.status(403).json({
+          message: 'Access denied: this voter is outside your assigned jurisdiction',
+        });
+      }
+    }
+
+    res.json(voter);
+  } catch (error) {
+    if (error.name === 'CastError') {
+      return res.status(404).json({ message: 'Voter not found' });
+    }
+    res.status(500).json({ message: 'Unable to retrieve voter details' });
   }
 });
 
@@ -99,7 +145,7 @@ router.put('/voter/edit/:id', async (req, res) => {
     if (req.user.role === 'head' && req.body.address) update.address = parseAddress(req.body.address);
     const voter = await Voter.findOneAndUpdate({ _id: req.params.id, ...scopeFor(req) }, update, { new: true, runValidators: true });
     if (!voter) return res.status(404).json({ message: 'Voter not found in your jurisdiction' });
-    res.json({ message: 'Voter updated successfully', voter });
+    res.json({ message: 'Voter updated successfully', voter: await Voter.findById(voter._id).select(SAFE_VOTER_FIELDS) });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
