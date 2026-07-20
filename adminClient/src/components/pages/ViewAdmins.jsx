@@ -13,7 +13,7 @@ export default function ViewAdmins() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/head/view`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/head/view`, { headers: { Authorization: `Bearer ${localStorage.getItem('headToken')}` } })
       .then(res => {
         setAdmins(res.data);
         setLoading(false);

@@ -39,7 +39,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 const headLoginRoutes = require("./routes/headLogin");
 const adminLoginRoutes = require("./routes/adminLogin");
-const adminRoute = require("./routes/admin");
+const adminRoute = require("./routes/candidate");
 const headRoute = require("./routes/head");
 const voterRoutes = require('./routes/voter');
 const electionRoutes = require('./routes/election');

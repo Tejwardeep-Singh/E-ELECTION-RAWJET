@@ -8,13 +8,13 @@ export default function EditAdmin() {
   const navigate = useNavigate();
 
   const fetchAdmins = () => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/head/view`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/head/view`, { headers: { Authorization: `Bearer ${localStorage.getItem('headToken')}` } })
       .then(res => setAdmins(res.data))
       .catch(err => console.error(err));
   };
 
   const handleEdit = (adminId, updatedData) => {
-    axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/head/edit/${adminId}`, updatedData)
+    axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/head/edit/${adminId}`, updatedData, { headers: { Authorization: `Bearer ${localStorage.getItem('headToken')}` } })
       .then(() => fetchAdmins())
       .catch(err => console.error(err));
   };
@@ -52,13 +52,21 @@ export default function EditAdmin() {
           const updated = {
             userId: e.target.userId.value,
             name: e.target.name.value,
-            password: e.target.password.value
+            password: e.target.password.value,
+            address: {
+              state: e.target.state.value,
+              city: e.target.city.value,
+              area: e.target.area.value,
+            },
           };
           handleEdit(admin._id, updated);
         }} className="border p-3 mb-3 rounded shadow-sm">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <input defaultValue={admin.userId} name="userId" className="border p-1 rounded" />
             <input defaultValue={admin.name} name="name" className="border p-1 rounded" />
+            <input defaultValue={admin.address?.state} name="state" required placeholder="State" className="border p-1 rounded" />
+            <input defaultValue={admin.address?.city} name="city" required placeholder="City" className="border p-1 rounded" />
+            <input defaultValue={admin.address?.area} name="area" required placeholder="Area" className="border p-1 rounded" />
             <input name="password" placeholder="New Password" className="border p-1 rounded" />
             <button type="submit" className="bg-blue-600 text-white px-3 py-1 rounded">Update</button>
           </div>

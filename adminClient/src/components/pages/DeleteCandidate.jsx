@@ -8,7 +8,7 @@ export default function DeleteCandidate() {
   const navigate = useNavigate();
 
   const fetchData = () => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/view`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/view`, { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } })
       .then(res => setCandidates(res.data))
       .catch(err => console.error(err));
   };
@@ -20,7 +20,7 @@ export default function DeleteCandidate() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this candidate?")) return;
     try {
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/delete/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/delete/${id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } });
       alert("Candidate deleted!");
       fetchData();
     } catch (err) {
@@ -30,7 +30,7 @@ export default function DeleteCandidate() {
   };
 
   const filtered = candidates.filter(c =>
-    c.name.toLowerCase().includes(search.toLowerCase()) || c.area.toLowerCase().includes(search.toLowerCase())
+    c.name.toLowerCase().includes(search.toLowerCase()) || c.address?.area?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -52,7 +52,7 @@ export default function DeleteCandidate() {
 
       {filtered.map(c => (
         <div key={c._id} className="border p-4 mb-3 rounded flex justify-between items-center">
-          <span>{c.name} - {c.area}</span>
+          <span>{c.name} - {c.address?.area}</span>
           <button onClick={() => handleDelete(c._id)} className="bg-red-600 text-white px-4 py-1 rounded">Delete</button>
         </div>
       ))}

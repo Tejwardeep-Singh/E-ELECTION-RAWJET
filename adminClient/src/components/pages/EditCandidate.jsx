@@ -10,7 +10,7 @@ export default function EditCandidate() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/view`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/view`, { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } })
       .then(res => {
         setCandidates(res.data);
         setLoading(false);
@@ -27,7 +27,7 @@ export default function EditCandidate() {
     const data = new FormData(form);
 
     try {
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/edit/${id}`, data);
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/edit/${id}`, data, { headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` } });
       alert("Candidate updated successfully!");
       window.location.reload();
     } catch (err) {
@@ -38,7 +38,7 @@ export default function EditCandidate() {
 
   const filtered = candidates.filter(c =>
     (c.name && c.name.toLowerCase().includes(search.toLowerCase())) || 
-    (c.area && c.area.toLowerCase().includes(search.toLowerCase()))
+    (c.address?.area && c.address.area.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -108,7 +108,7 @@ export default function EditCandidate() {
                     </p>
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50 px-2.5 py-1 rounded-md border border-slate-200/40">
-                    Constituency: {c.area || "N/A"}
+                    Constituency: {c.address?.area || "N/A"}
                   </span>
                 </div>
 
@@ -137,7 +137,7 @@ export default function EditCandidate() {
                     <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Constituency Area</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><MapPin size={13} /></div>
-                      <input name="area" defaultValue={c.area} className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white transition-all" />
+                      <input name="area" defaultValue={c.address?.area} readOnly className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold rounded-xl" />
                     </div>
                   </div>
 
@@ -146,7 +146,7 @@ export default function EditCandidate() {
                     <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">City Jurisdiction</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Building2 size={13} /></div>
-                      <input name="city" defaultValue={c.city} className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white transition-all" />
+                      <input name="city" defaultValue={c.address?.city} readOnly className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold rounded-xl" />
                     </div>
                   </div>
 
@@ -155,7 +155,7 @@ export default function EditCandidate() {
                     <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">State Node</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400"><Building2 size={13} /></div>
-                      <input name="state" defaultValue={c.state} className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white transition-all" />
+                      <input name="state" defaultValue={c.address?.state} readOnly className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 text-slate-900 text-xs font-semibold rounded-xl" />
                     </div>
                   </div>
 

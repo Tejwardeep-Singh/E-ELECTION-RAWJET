@@ -53,7 +53,7 @@ export default function VoterResult() {
         <ul className="space-y-4">
           {results.map((c, index) => (
             <li key={c._id} className="border p-4 rounded shadow">
-              <h3 className="font-semibold text-lg">{index + 1}. {c.name} ({c.area})</h3>
+              <h3 className="font-semibold text-lg">{index + 1}. {c.name} ({c.address?.area})</h3>
               <p className="text-sm">Votes: {c.voteCount}</p>
               <p className="text-sm">Criminal Cases: {c.criminalCase || 'None'}</p>
               <img src={c.candidateImage} alt={c.name} className="h-20 mt-2" />

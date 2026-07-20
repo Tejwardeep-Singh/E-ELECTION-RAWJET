@@ -23,12 +23,12 @@ export default function SetElection() {
     }
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/head/set`, {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/head/set`, {
         startTime,
         endTime
-      });
+      }, { headers: { Authorization: `Bearer ${localStorage.getItem('headToken')}` } });
       setMessage('Election scheduling windows successfully initialized.');
-    } catch (err) {
+    } catch {
       setIsError(true);
       setMessage('Network configuration fault: Failed to submit election window.');
     }

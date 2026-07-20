@@ -6,6 +6,7 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "migrate:voters": "node scripts/migrateVoters.js",
+    "migrate:jurisdictions": "node scripts/migrateJurisdictions.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

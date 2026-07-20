@@ -26,7 +26,10 @@ export default function VoterDashboard() {
         setVoter(voterRes.data);
         setVoted(voterRes.data.votingStatus === 'voted');
         
-        const candidatesRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/by-area/${voterRes.data.address.area}`);
+        const { area, city, state } = voterRes.data.address;
+        const candidatesRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/by-area/${area}`, {
+          params: { city, state },
+        });
         setCandidates(candidatesRes.data);
       } catch (err) {
         console.error('Failed to fetch voter/candidates:', err);

@@ -10,7 +10,7 @@ export default function ViewCandidates() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/view`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/view`, { headers: { Authorization: `Bearer ${localStorage.getItem('headToken')}` } })
       .then(res => {
         setCandidates(res.data);
         setLoading(false);
@@ -23,7 +23,7 @@ export default function ViewCandidates() {
 
   const filtered = candidates.filter(c =>
     (c.name && c.name.toLowerCase().includes(search.toLowerCase())) || 
-    (c.area && c.area.toLowerCase().includes(search.toLowerCase()))
+    (c.address?.area && c.address.area.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -63,7 +63,7 @@ export default function ViewCandidates() {
             type="text"
             placeholder="Search by candidate name or area..."
             value={search}
-            onChange={(e) => setSearch}
+            onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-11 pr-4 py-2.5 bg-white border border-slate-200 text-slate-900 text-sm font-medium rounded-xl shadow-sm focus:outline-none focus:border-blue-600 focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-slate-400/80"
           />
         </div>
@@ -111,7 +111,7 @@ export default function ViewCandidates() {
                     <MapPin size={14} className="text-slate-400 shrink-0" />
                     <div>
                       <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wide">Area Constituency</span>
-                      <span className="font-semibold text-slate-900">{c.area || "N/A"}</span>
+                      <span className="font-semibold text-slate-900">{c.address?.area || "N/A"}</span>
                     </div>
                   </div>
 
@@ -119,7 +119,7 @@ export default function ViewCandidates() {
                     <Building2 size={14} className="text-slate-400 shrink-0" />
                     <div>
                       <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wide">City Location</span>
-                      <span className="font-semibold text-slate-900">{c.city || "N/A"}</span>
+                      <span className="font-semibold text-slate-900">{c.address?.city || "N/A"}</span>
                     </div>
                   </div>
 
@@ -127,7 +127,7 @@ export default function ViewCandidates() {
                     <Building2 size={14} className="text-slate-400 shrink-0" />
                     <div>
                       <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-wide">State Node</span>
-                      <span className="font-semibold text-slate-900">{c.state || "N/A"}</span>
+                      <span className="font-semibold text-slate-900">{c.address?.state || "N/A"}</span>
                     </div>
                   </div>
 

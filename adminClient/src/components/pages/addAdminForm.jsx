@@ -7,7 +7,8 @@ export default function AddAdminForm() {
   const [formData, setFormData] = useState({
     userId: '',
     name: '',
-    password: ''
+    password: '',
+    address: { state: '', city: '', area: '' },
   });
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
@@ -15,6 +16,11 @@ export default function AddAdminForm() {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
+    const [group, field] = e.target.name.split('.');
+    if (field) {
+      setFormData({ ...formData, [group]: { ...formData[group], [field]: e.target.value } });
+      return;
+    }
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
@@ -28,9 +34,11 @@ export default function AddAdminForm() {
 
     try {
       const baseURL = import.meta.env.VITE_API_BASE_URL;
-      const res = await axios.post(`${baseURL}/api/head/add`, formData);
+      const res = await axios.post(`${baseURL}/api/head/add`, formData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('headToken')}` },
+      });
       setMessage(res.data.message || "Admin registered successfully.");
-      setFormData({ userId: '', name: '', password: '' });
+      setFormData({ userId: '', name: '', password: '', address: { state: '', city: '', area: '' } });
     } catch (err) {
       console.error("Error adding admin:", err);
       setIsError(true);
@@ -127,6 +135,19 @@ export default function AddAdminForm() {
                 className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl focus:outline-none focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-600/5 transition-all placeholder:text-slate-400/70"
               />
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label htmlFor="state" className="block text-[11px] font-bold uppercase tracking-wider text-[#64748B]">State</label>
+            <input type="text" name="address.state" id="state" value={formData.address.state} onChange={handleChange} required className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl focus:outline-none focus:border-blue-600" />
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="city" className="block text-[11px] font-bold uppercase tracking-wider text-[#64748B]">City</label>
+            <input type="text" name="address.city" id="city" value={formData.address.city} onChange={handleChange} required className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl focus:outline-none focus:border-blue-600" />
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="area" className="block text-[11px] font-bold uppercase tracking-wider text-[#64748B]">Area</label>
+            <input type="text" name="address.area" id="area" value={formData.address.area} onChange={handleChange} required className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 text-slate-900 text-sm font-medium rounded-xl focus:outline-none focus:border-blue-600" />
           </div>
 
           {/* Input 3: Admin Security Password */}

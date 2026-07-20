@@ -6,7 +6,6 @@ export default function AddCandidate() {
   const [formData, setFormData] = useState({
     id: '',
     name: '',
-    area: '',
     criminalCase: '',
   });
   const [candidateImage, setCandidateImage] = useState(null);
@@ -25,7 +24,9 @@ export default function AddCandidate() {
     data.append('partyImage', partyImage);
 
     try {
-      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/add`, data);
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/admin/candidate/add`, data, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` },
+      });
       alert("Candidate added successfully!");
       navigate('/admin/dashboard');
     } catch (err) {
@@ -46,9 +47,6 @@ export default function AddCandidate() {
       <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
         <input name="id" type="number" required placeholder="Candidate ID" className="w-full border p-2 rounded" onChange={handleChange} />
         <input name="name" required placeholder="Name" className="w-full border p-2 rounded" onChange={handleChange} />
-        <input name="area" required placeholder="Area" className="w-full border p-2 rounded" onChange={handleChange} />
-        <input name="city" required placeholder="City" className="w-full border p-2 rounded" onChange={handleChange} />
-        <input name="state" required placeholder="State" className="w-full border p-2 rounded" onChange={handleChange} />
         <input name="criminalCase" placeholder="Criminal Case Info" className="w-full border p-2 rounded" onChange={handleChange} />
         <div className="mb-4">
           <label className="block mb-1 font-medium text-gray-700">Candidate Image:</label>

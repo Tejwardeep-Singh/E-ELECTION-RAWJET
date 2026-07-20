@@ -11,15 +11,10 @@ const candidateSchema = mongoose.Schema({
         required:true,
 
     },
-    area:{
-        type:String,
-        required:true,
-    },
-    city:{
-        type:String,
-    },
-    state:{
-        type:String,
+    address: {
+        state: { type: String, required: true },
+        city: { type: String, required: true },
+        area: { type: String, required: true },
     },
     candidateImage:{
         type:String,

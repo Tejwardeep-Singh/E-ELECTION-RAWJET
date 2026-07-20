@@ -77,7 +77,7 @@ useEffect(() => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/head/show-results`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('headToken')}` },
       });
       const data = await res.json();
       if (res.ok) {
@@ -95,7 +95,7 @@ useEffect(() => {
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/head/reset-election`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('headToken')}` },
       });
       const data = await res.json();
       if (res.ok) {

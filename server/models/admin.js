@@ -13,5 +13,10 @@ const adminSchema = mongoose.Schema({
         type:String,
         required: true
     },
+    address: {
+        state: { type: String, required: true },
+        city: { type: String, required: true },
+        area: { type: String, required: true },
+    },
 });
 module.exports = mongoose.model("admin",adminSchema);

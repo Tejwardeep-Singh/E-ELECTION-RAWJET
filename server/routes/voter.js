@@ -136,7 +136,11 @@ router.get('/results', authenticateVoter, async (req, res) => {
     const voter = await Voter.findById(req.voterId);
     if (!voter) return res.status(404).json({ message: 'Voter not found' });
 
-    const candidates = await Candidate.find({ area: voter.address.area }).sort({ voteCount: -1 });
+    const candidates = await Candidate.find({
+      'address.state': voter.address.state,
+      'address.city': voter.address.city,
+      'address.area': voter.address.area,
+    }).sort({ voteCount: -1 });
 
     res.json({ address: voter.address, candidates });
   } catch (err) {

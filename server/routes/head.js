@@ -6,11 +6,18 @@ const electionConfig=require("../models/elections");
 const Voter=require("../models/voter");
 const bcrypt = require("bcrypt");
 const moment = require('moment-timezone'); 
+const authenticate = require('../middlewares/authenticate');
+const authorizeHead = require('../middlewares/authorizeHead');
 
+router.use(authenticate, authorizeHead);
 
 router.post("/add", async (req, res) => {
   try {
-    const { userId, name, password } = req.body;
+    const { userId, name, password, address } = req.body;
+
+    if (!address?.state || !address?.city || !address?.area) {
+      return res.status(400).json({ message: 'State, city, and area are required' });
+    }
 
     const existingAdmin = await Admin.findOne({ userId });
     if (existingAdmin) {
@@ -22,7 +29,8 @@ router.post("/add", async (req, res) => {
     const newAdmin = new Admin({
       userId,
       name,
-      password: hashedPassword
+      password: hashedPassword,
+      address,
     });
 
     await newAdmin.save();
@@ -37,7 +45,7 @@ router.get('/candidates/:area', async (req, res) => {
     const area = req.params.area;
 
   
-    const candidates = await Candidate.find({ area: { $regex: new RegExp(area, 'i') } });
+    const candidates = await Candidate.find({ 'address.area': { $regex: new RegExp(area, 'i') } });
 
     res.status(200).json(candidates);
   } catch (error) {
@@ -54,10 +62,21 @@ router.delete("/delete/:id", async (req, res) => {
   res.sendStatus(204);
 });
 router.put("/edit/:id", async (req, res) => {
-  const { userId, name, password } = req.body;
-  const hashedPassword = await bcrypt.hash(password, 10);
-  await Admin.findByIdAndUpdate(req.params.id, { userId, name, password: hashedPassword });
-  res.sendStatus(200);
+  try {
+    const { userId, name, password, address } = req.body;
+    if (!address?.state || !address?.city || !address?.area) {
+      return res.status(400).json({ message: 'State, city, and area are required' });
+    }
+
+    const update = { userId, name, address };
+    if (password) update.password = await bcrypt.hash(password, 10);
+
+    const admin = await Admin.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true });
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+    res.json({ message: 'Admin updated successfully', admin });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 router.get('/election', async (req, res) => {
   try {
