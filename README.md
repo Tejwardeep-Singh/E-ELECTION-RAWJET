@@ -1,3 +1,24 @@
+## AI face enrollment (Phase 1)
+
+The independent FastAPI service in `ai-service/` enrolls a face from the voter
+image already stored by Cloudinary. Set `AI_SERVICE_URL` in `server/.env` (see
+`server/.env.example`), then start it separately:
+
+```bash
+cd ai-service
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app:app --host 127.0.0.1 --port 8000
+```
+
+During voter registration, Express saves the voter image and voter record,
+posts the Cloudinary image URL to the internal `POST /enroll` service, and stores the
+returned template in the internal `FaceProfile` collection. Enrollment is
+bounded by `AI_SERVICE_TIMEOUT_MS`; a failure is logged and registration still
+succeeds with `faceEnrolled: false`. No public endpoint returns a FaceProfile
+or its embedding.
+
 <p align="center">
   <img src="/screenshots/banner2.png" alt="BharatBallot Banner" width="100%" />
 </p>

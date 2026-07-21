@@ -6,6 +6,7 @@ const Candidate = require('../models/candidate');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { voterUpload } = require("../config/cloudinaryUpload");
+const { enrollVoterFace } = require('../services/faceEnrollment');
 
 const uploadVoterImage = (req, res, next) => {
 
@@ -61,6 +62,17 @@ router.post('/register', uploadVoterImage, async (req, res) => {
     });
 
     await newVoter.save();
+
+    // Registration is deliberately resilient: the voter is retained even if
+    // the independent AI service is unavailable or rejects the image.
+    if (photoUrl) {
+      try {
+        await enrollVoterFace(newVoter, photoUrl);
+      } catch (enrollmentError) {
+        console.error(`Face enrollment failed for voter ${newVoter._id}:`, enrollmentError.message);
+      }
+    }
+
     res.status(201).json({ message: 'Voter registered successfully' });
   } catch (err) {
     console.error('Error registering voter:', err);
@@ -101,7 +113,9 @@ router.post('/login', async (req, res) => {
   }
   router.get('/me', authenticateVoter, async (req, res) => {
     try {
-      const voter = await Voter.findById(req.voterId).select('-password');
+      // Explicitly exclude the legacy field as well as the password. New
+      // embeddings live only in FaceProfile, which has no public route.
+      const voter = await Voter.findById(req.voterId).select('-password -faceEmbedding');
       if (!voter) return res.status(404).json({ message: 'Voter not found' });
       res.json(voter);
     } catch (err) {

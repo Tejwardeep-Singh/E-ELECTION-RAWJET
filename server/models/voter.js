@@ -40,9 +40,12 @@ const voterSchema = mongoose.Schema({
     photoUrl: {
         type: String
     },
-    faceEmbedding: {
-        type: [Number],
-        default: undefined,
+    // The biometric template itself lives in the internal-only FaceProfile
+    // collection. This flag lets future flows determine whether enrollment
+    // succeeded without reading or exposing that template.
+    faceEnrolled: {
+        type: Boolean,
+        default: false,
     },
     votingStatus: {
         type: String,
