@@ -7,7 +7,7 @@ module.exports = async (req, res, next) => {
 
   try {
     const admin = await Admin.findOne({ userId: req.user.userId }).select('-password');
-    if (!admin || !admin.address?.state || !admin.address?.city || !admin.address?.area) {
+    if (!admin || !admin.electionId || !admin.constituencyId) {
       return res.status(403).json({ message: 'Admin jurisdiction is not configured' });
     }
 

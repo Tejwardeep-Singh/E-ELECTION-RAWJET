@@ -8,12 +8,16 @@ const bcrypt = require("bcrypt");
 const moment = require('moment-timezone'); 
 const authenticate = require('../middlewares/authenticate');
 const authorizeHead = require('../middlewares/authorizeHead');
+const { validateElectionAssignment } = require('../services/electionScope');
 
 router.use(authenticate, authorizeHead);
 
 router.post("/add", async (req, res) => {
   try {
-    const { userId, name, password, address } = req.body;
+    const { userId, name, password, electionId, constituencyId } = req.body;
+
+    const { constituency } = await validateElectionAssignment(electionId, constituencyId);
+    const address = { state: constituency.state, city: constituency.district, area: constituency.name };
 
     if (!address?.state || !address?.city || !address?.area) {
       return res.status(400).json({ message: 'State, city, and area are required' });
@@ -30,7 +34,7 @@ router.post("/add", async (req, res) => {
       userId,
       name,
       password: hashedPassword,
-      address,
+      address, electionId, constituencyId,
     });
 
     await newAdmin.save();
@@ -63,12 +67,11 @@ router.delete("/delete/:id", async (req, res) => {
 });
 router.put("/edit/:id", async (req, res) => {
   try {
-    const { userId, name, password, address } = req.body;
-    if (!address?.state || !address?.city || !address?.area) {
-      return res.status(400).json({ message: 'State, city, and area are required' });
-    }
+    const { userId, name, password, electionId, constituencyId } = req.body;
+    const { constituency } = await validateElectionAssignment(electionId, constituencyId);
+    const address = { state: constituency.state, city: constituency.district, area: constituency.name };
 
-    const update = { userId, name, address };
+    const update = { userId, name, address, electionId, constituencyId };
     if (password) update.password = await bcrypt.hash(password, 10);
 
     const admin = await Admin.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true });

@@ -18,5 +18,17 @@ const adminSchema = mongoose.Schema({
         city: { type: String, required: true },
         area: { type: String, required: true },
     },
+    electionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Election',
+        required: true,
+        index: true,
+    },
+    constituencyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Constituency',
+        required: true,
+        index: true,
+    },
 });
 module.exports = mongoose.model("admin",adminSchema);

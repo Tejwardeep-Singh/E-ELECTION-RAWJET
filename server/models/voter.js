@@ -62,6 +62,18 @@ const voterSchema = mongoose.Schema({
         enum: ["active", "inactive", "suspended"],
         default: "active",
     },
+    electionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Election',
+        required: true,
+        index: true,
+    },
+    constituencyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Constituency',
+        required: true,
+        index: true,
+    },
 }, {
     timestamps: true,
 });

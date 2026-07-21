@@ -30,6 +30,19 @@ const candidateSchema = mongoose.Schema({
     voteCount:{
         type:Number,
     }
+    ,electionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Election',
+        required: true,
+        index: true,
+    },
+    constituencyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Constituency',
+        required: true,
+        index: true,
+    },
     
 });
+candidateSchema.index({ electionId: 1, id: 1 }, { unique: true });
 module.exports = mongoose.model("candidate",candidateSchema);
