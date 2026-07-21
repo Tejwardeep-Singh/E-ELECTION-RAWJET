@@ -13,6 +13,7 @@ const adminSchema = mongoose.Schema({
         type:String,
         required: true
     },
+    profileImage: { type: String, default: '' },
     address: {
         state: { type: String, required: true },
         city: { type: String, required: true },

@@ -5,6 +5,31 @@ const Voter = require('../models/voter');
 const { upload } = require('../config/cloudinaryUpload');
 const authenticate = require('../middlewares/authenticate');
 const allowHeadOrAdmin = require('../middlewares/allowHeadOrAdmin');
+const loadAdmin = require('../middlewares/loadAdmin');
+const Admin = require('../models/admin');
+const Election = require('../models/election');
+const Constituency = require('../models/constituency');
+const bcrypt = require('bcrypt');
+
+router.get('/me', authenticate, loadAdmin, async (req, res) => {
+  try {
+    const [election, constituency] = await Promise.all([
+      Election.findById(req.admin.electionId).select('title status'),
+      Constituency.findById(req.admin.constituencyId).select('name'),
+    ]);
+    res.json({ ...req.admin.toObject(), election, constituency });
+  } catch (error) { res.status(500).json({ message: 'Unable to load profile' }); }
+});
+
+router.put('/profile', authenticate, loadAdmin, async (req, res) => {
+  try {
+    const update = {};
+    if (req.body.password) update.password = await bcrypt.hash(req.body.password, 10);
+    if (req.body.profileImage) update.profileImage = req.body.profileImage;
+    const admin = await Admin.findByIdAndUpdate(req.admin._id, update, { new: true }).select('-password');
+    res.json({ message: 'Profile updated successfully', admin });
+  } catch (error) { res.status(400).json({ message: 'Unable to update profile' }); }
+});
 
 // Keep administrative voter responses deliberately allow-listed.  In
 // particular, neither credentials nor biometric templates may leave the API.
@@ -60,7 +85,11 @@ router.post('/candidate/add', upload.fields([
       return res.status(400).json({ error: 'Candidate details, jurisdiction, and both images are required' });
     }
 
-    await new Candidate({ id, name, address, candidateImage, partyImage, criminalCase: criminalCase || '', voteCount: 0 }).save();
+    await new Candidate({
+      id, name, address, candidateImage, partyImage, criminalCase: criminalCase || '', voteCount: 0,
+      electionId: req.user.role === 'admin' ? req.admin.electionId : req.body.electionId,
+      constituencyId: req.user.role === 'admin' ? req.admin.constituencyId : req.body.constituencyId,
+    }).save();
     res.status(201).json({ message: 'Candidate added successfully' });
   } catch (error) {
     res.status(500).json({ error: error.code === 11000 ? 'Candidate ID already exists' : 'Internal Server Error' });
@@ -139,7 +168,7 @@ router.get('/voters/:id', authenticate, allowHeadOrAdmin, async (req, res) => {
   }
 });
 
-router.put('/voter/edit/:id', async (req, res) => {
+router.put('/voter/edit/:id', authenticate, allowHeadOrAdmin, async (req, res) => {
   try {
     const update = { name: req.body.name, status: req.body.status };
     if (req.user.role === 'head' && req.body.address) update.address = parseAddress(req.body.address);

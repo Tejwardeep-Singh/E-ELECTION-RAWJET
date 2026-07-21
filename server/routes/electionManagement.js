@@ -14,7 +14,7 @@ router.post('/', async (req, res) => {
   try {
     const { title, description, type, state, startDate, endDate } = req.body;
     if (!title || !type || !state) return res.status(400).json({ message: 'Title, type, and state are required' });
-    const election = await Election.create({ title, description, type, state, startDate: startDate || null, endDate: endDate || null, createdBy: req.user.userId, status: 'Draft' });
+    const election = await Election.create({ title, description, type, state, startDate: startDate || null, endDate: endDate || null, createdBy: req.user.mongoId, status: 'Draft' });
     res.status(201).json(election);
   } catch (error) { res.status(400).json({ message: error.message }); }
 });

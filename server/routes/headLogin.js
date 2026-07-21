@@ -12,7 +12,7 @@ router.post('/', async (req, res) => {
 
   const valid = await bcrypt.compare(password, head.password);
   if (!valid) return res.status(401).send("Invalid password");
-  const token = jwt.sign({ role: 'head', userId: head.userId },JWT_KEY, { expiresIn: '1h' });
+  const token = jwt.sign({ role: 'head', userId: head.userId,mongoId: head._id  },JWT_KEY, { expiresIn: '1h' });
     if (!token) return res.status(500).send("Error generating token");
     res.json({ token });
 });
