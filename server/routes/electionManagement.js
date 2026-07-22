@@ -4,6 +4,7 @@ const authenticate = require('../middlewares/authenticate');
 const authorizeHead = require('../middlewares/authorizeHead');
 const Election = require('../models/election');
 const Constituency = require('../models/constituency');
+const MasterConstituency = require('../models/masterConstituency');
 const Admin = require('../models/admin');
 const Candidate = require('../models/candidate');
 const Voter = require('../models/voter');
@@ -12,9 +13,35 @@ router.use(authenticate, authorizeHead);
 
 router.post('/', async (req, res) => {
   try {
-    const { title, description, type, state, startDate, endDate } = req.body;
+    const { title, description, type, state, city, startDate, endDate } = req.body;
     if (!title || !type || !state) return res.status(400).json({ message: 'Title, type, and state are required' });
-    const election = await Election.create({ title, description, type, state, startDate: startDate || null, endDate: endDate || null, createdBy: req.user.mongoId, status: 'Draft' });
+    const election = await Election.create({ title, description, type, state, city: city || null, startDate: startDate || null, endDate: endDate || null, createdBy: req.user.mongoId, status: 'Draft' });
+
+    const masterFilter = { electionType: type, state };
+    if (city) masterFilter.city = city;
+    const masterConstituencies = await MasterConstituency.find(masterFilter).lean();
+    const masters = await MasterConstituency.find({
+    electionType: election.electionType,
+    state: election.state,
+    city: election.city || null,
+});
+
+
+
+
+    if (masterConstituencies.length) {
+      await Constituency.insertMany(masterConstituencies.map((master) => ({
+        electionId: election._id,
+        election: election._id,
+        constituencyNumber: master.constituencyNumber,
+        constituencyName: master.constituencyName,
+        active: master.active,
+        // Keep existing required fields populated for the rest of the app.
+        name: master.constituencyName,
+        district: master.city || city || state,
+        state: master.state,
+      })));
+    }
     res.status(201).json(election);
   } catch (error) { res.status(400).json({ message: error.message }); }
 });
@@ -41,7 +68,7 @@ router.put('/:electionId', async (req, res) => {
     const election = await Election.findById(req.params.electionId);
     if (!election) return res.status(404).json({ message: 'Election not found' });
     if (election.status === 'Archived') return res.status(409).json({ message: 'Archived elections are read-only' });
-    ['title', 'description', 'type', 'state', 'startDate', 'endDate'].forEach((field) => { if (req.body[field] !== undefined) election[field] = req.body[field]; });
+    ['title', 'description', 'type', 'state', 'city', 'startDate', 'endDate'].forEach((field) => { if (req.body[field] !== undefined) election[field] = req.body[field]; });
     await election.save(); res.json(election);
   } catch (error) { res.status(400).json({ message: error.message }); }
 });
@@ -76,12 +103,12 @@ router.delete('/:electionId', async (req, res) => {
   await Constituency.deleteMany({ electionId: election._id }); await election.deleteOne(); res.sendStatus(204);
 });
 
-router.get('/:electionId/constituencies', async (req, res) => res.json(await Constituency.find({ electionId: req.params.electionId }).sort({ name: 1 })));
+router.get('/:electionId/constituencies', async (req, res) => res.json(await Constituency.find({ electionId: req.params.electionId }).sort({ constituencyNumber: 1, constituencyName: 1 })));
 router.post('/:electionId/constituencies', async (req, res) => {
   const election = await Election.findById(req.params.electionId);
   if (!election) return res.status(404).json({ message: 'Election not found' });
   if (election.status === 'Archived') return res.status(409).json({ message: 'Archived elections are read-only' });
-  try { res.status(201).json(await Constituency.create({ ...req.body, state: req.body.state || election.state, electionId: election._id })); }
+  try { res.status(201).json(await Constituency.create({ ...req.body, state: req.body.state || election.state, electionId: election._id, election: election._id })); }
   catch (error) { res.status(400).json({ message: error.code === 11000 ? 'Constituency name already exists in this election' : error.message }); }
 });
 router.put('/:electionId/constituencies/:constituencyId', async (req, res) => {

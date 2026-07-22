@@ -17,10 +17,10 @@ router.post("/add", async (req, res) => {
     const { userId, name, password, electionId, constituencyId } = req.body;
 
     const { constituency } = await validateElectionAssignment(electionId, constituencyId);
-    const address = { state: constituency.state, city: constituency.district, area: constituency.name };
+    const address = { state: constituency.state, city: constituency.district };
 
-    if (!address?.state || !address?.city || !address?.area) {
-      return res.status(400).json({ message: 'State, city, and area are required' });
+    if (!address?.state || !address?.city) {
+      return res.status(400).json({ message: 'Selected constituency has incomplete location data' });
     }
 
     const existingAdmin = await Admin.findOne({ userId });
@@ -41,7 +41,7 @@ router.post("/add", async (req, res) => {
     res.status(201).json({ message: "Admin created successfully" });
   } catch (err) {
     console.error("Error creating admin:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(400).json({ message: err.message || 'Invalid administrator assignment' });
   }
 });
 router.get('/candidates/:area', async (req, res) => {
@@ -69,7 +69,7 @@ router.put("/edit/:id", async (req, res) => {
   try {
     const { userId, name, password, electionId, constituencyId } = req.body;
     const { constituency } = await validateElectionAssignment(electionId, constituencyId);
-    const address = { state: constituency.state, city: constituency.district, area: constituency.name };
+    const address = { state: constituency.state, city: constituency.district };
 
     const update = { userId, name, address, electionId, constituencyId };
     if (password) update.password = await bcrypt.hash(password, 10);
@@ -78,7 +78,7 @@ router.put("/edit/:id", async (req, res) => {
     if (!admin) return res.status(404).json({ message: 'Admin not found' });
     res.json({ message: 'Admin updated successfully', admin });
   } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(400).json({ message: err.message || 'Invalid administrator assignment' });
   }
 });
 router.get('/election', async (req, res) => {

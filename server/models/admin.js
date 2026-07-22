@@ -14,10 +14,12 @@ const adminSchema = mongoose.Schema({
         required: true
     },
     profileImage: { type: String, default: '' },
+    // Jurisdiction assignment is stored by ObjectId below.  Keep the legacy
+    // location fields only for state/city compatibility; never store the
+    // constituency name on an Admin record.
     address: {
-        state: { type: String, required: true },
-        city: { type: String, required: true },
-        area: { type: String, required: true },
+        state: { type: String },
+        city: { type: String },
     },
     electionId: {
         type: mongoose.Schema.Types.ObjectId,

@@ -45,6 +45,7 @@ const voterRoutes = require('./routes/voter');
 const electionRoutes = require('./routes/election');
 const resultsRouter = require('./routes/results');
 const electionManagementRoutes = require('./routes/electionManagement');
+const constituencyRoutes = require('./routes/constituencies');
 
 app.use("/api/headLogin", headLoginRoutes);
 app.use("/api/adminLogin", adminLoginRoutes);
@@ -54,6 +55,7 @@ app.use("/api/voter", voterRoutes);
 app.use("/api/election",electionRoutes);
 app.use("/api/results",resultsRouter);
 app.use('/api/head/elections', electionManagementRoutes);
+app.use(['/api/constituencies', '/constituencies'], constituencyRoutes);
 
 
 // app.get('/*', (req, res) => {

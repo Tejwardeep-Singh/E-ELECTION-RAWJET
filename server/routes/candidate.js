@@ -48,9 +48,8 @@ const SAFE_VOTER_FIELDS = [
 
 const scopeFor = (req) => req.user.role === 'admin'
   ? {
-      'address.state': req.admin.address.state,
-      'address.city': req.admin.address.city,
-      'address.area': req.admin.address.area,
+      electionId: req.admin.electionId,
+      constituencyId: req.admin.constituencyId,
     }
   : {};
 
@@ -77,7 +76,12 @@ router.post('/candidate/add', upload.fields([
 ]), async (req, res) => {
   try {
     const { id, name, criminalCase } = req.body;
-    const address = req.user.role === 'admin' ? req.admin.address : parseAddress(req.body.address);
+    const constituency = req.user.role === 'admin'
+      ? await Constituency.findOne({ _id: req.admin.constituencyId, electionId: req.admin.electionId })
+      : null;
+    const address = req.user.role === 'admin'
+      ? { state: constituency?.state, city: constituency?.district, area: constituency?.name }
+      : parseAddress(req.body.address);
     const candidateImage = req.files?.candidateImage?.[0]?.path;
     const partyImage = req.files?.partyImage?.[0]?.path;
 
@@ -147,10 +151,8 @@ router.get('/voters/:id', authenticate, allowHeadOrAdmin, async (req, res) => {
 
     if (req.user.role === 'admin') {
       const voterAddress = voter.address || {};
-      const adminAddress = req.admin.address;
-      const isAssignedArea = voterAddress.state === adminAddress.state
-        && voterAddress.city === adminAddress.city
-        && voterAddress.area === adminAddress.area;
+      const isAssignedArea = String(voter.electionId) === String(req.admin.electionId)
+        && String(voter.constituencyId) === String(req.admin.constituencyId);
 
       if (!isAssignedArea) {
         return res.status(403).json({

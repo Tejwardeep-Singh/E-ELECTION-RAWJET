@@ -9,6 +9,9 @@ const electionSchema = new mongoose.Schema({
     enum: ['Panchayat', 'Municipal', 'District', 'Assembly', 'Lok Sabha', 'Student Council', 'Other'],
   },
   state: { type: String, required: true, trim: true },
+  // City is optional because several election types (for example Assembly and
+  // Lok Sabha) are state-wide.  When present it scopes master constituencies.
+  city: { type: String, trim: true, default: null },
   status: { type: String, enum: ['Draft', 'Active', 'Completed', 'Archived'], default: 'Draft', index: true },
   startDate: { type: Date, default: null },
   endDate: { type: Date, default: null },
