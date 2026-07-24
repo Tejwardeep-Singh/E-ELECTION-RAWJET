@@ -1,23 +1,89 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const electionSchema = new mongoose.Schema({
-  title: { type: String, required: true, trim: true },
-  description: { type: String, trim: true, default: '' },
-  type: {
-    type: String,
-    required: true,
-    enum: ['Panchayat', 'Municipal', 'District', 'Assembly', 'Lok Sabha', 'Student Council', 'Other'],
-  },
-  state: { type: String, required: true, trim: true },
-  // City is optional because several election types (for example Assembly and
-  // Lok Sabha) are state-wide.  When present it scopes master constituencies.
-  city: { type: String, trim: true, default: null },
-  status: { type: String, enum: ['Draft', 'Active', 'Completed', 'Archived'], default: 'Draft', index: true },
-  startDate: { type: Date, default: null },
-  endDate: { type: Date, default: null },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'head', required: true },
-}, { timestamps: true });
+const electionSchema = new mongoose.Schema(
+{
+    title: {
+        type: String,
+        required: true,
+        trim: true,
+    },
 
-electionSchema.index({ state: 1, status: 1 });
+    description: {
+        type: String,
+        trim: true,
+        default: "",
+    },
 
-module.exports = mongoose.model('Election', electionSchema);
+    type: {
+        type: String,
+        required: true,
+        enum: [
+            "Lok Sabha",
+            "Assembly",
+            "District",
+            "Municipal",
+            "Panchayat",
+            "Student Council",
+            "Other",
+        ],
+    },
+
+    // Location hierarchy
+    state: {
+        type: String,
+        trim: true,
+        default: null,
+    },
+
+    district: {
+        type: String,
+        trim: true,
+        default: null,
+    },
+
+    city: {
+        type: String,
+        trim: true,
+        default: null,
+    },
+
+    status: {
+        type: String,
+        enum: [
+            "Draft",
+            "Active",
+            "Completed",
+            "Archived",
+        ],
+        default: "Draft",
+    },
+
+    startDate: {
+        type: Date,
+        default: null,
+    },
+
+    endDate: {
+        type: Date,
+        default: null,
+    },
+
+    createdBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "head",
+        required: true,
+    },
+},
+{
+    timestamps: true,
+}
+);
+
+// Helpful indexes
+electionSchema.index({ type: 1 });
+electionSchema.index({ status: 1 });
+electionSchema.index({ state: 1 });
+electionSchema.index({ district: 1 });
+electionSchema.index({ city: 1 });
+
+module.exports = mongoose.model("Election", electionSchema);

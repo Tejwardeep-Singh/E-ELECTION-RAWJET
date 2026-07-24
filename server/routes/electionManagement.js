@@ -8,23 +8,76 @@ const MasterConstituency = require('../models/masterConstituency');
 const Admin = require('../models/admin');
 const Candidate = require('../models/candidate');
 const Voter = require('../models/voter');
+const electionConfig = require("../config/electionConfig");
+
 
 router.use(authenticate, authorizeHead);
 
 router.post('/', async (req, res) => {
   try {
-    const { title, description, type, state, city, startDate, endDate } = req.body;
-    if (!title || !type || !state) return res.status(400).json({ message: 'Title, type, and state are required' });
-    const election = await Election.create({ title, description, type, state, city: city || null, startDate: startDate || null, endDate: endDate || null, createdBy: req.user.mongoId, status: 'Draft' });
+    const {
+      title,
+      description,
+      type,
+      state,
+      district,
+      city,
+      startDate,
+      endDate
+    } = req.body;
 
-    const masterFilter = { electionType: type, state };
-    if (city) masterFilter.city = city;
+    const config = electionConfig[type];
+
+    if (!config) {
+      return res.status(400).json({
+        message: "Invalid election type"
+      });
+    }
+
+    if (!title || !type) {
+      return res.status(400).json({
+        message: "Title and type are required"
+      });
+    }
+
+    if (config.state && !state) {
+      return res.status(400).json({
+        message: "State is required"
+      });
+    }
+
+    if (config.district && !district) {
+      return res.status(400).json({
+        message: "District is required"
+      });
+    }
+
+    if (config.city && !city) {
+      return res.status(400).json({
+        message: "City is required"
+      });
+    }
+    
+    
+    const election = await Election.create({ title, description, type, state, city: city || null,district: district || null, startDate: startDate || null, endDate: endDate || null, createdBy: req.user.mongoId, status: 'Draft' });
+
+    const masterFilter = {
+    electionType: type
+};
+
+if (config.state) {
+    masterFilter.state = state;
+}
+
+if (config.district) {
+    masterFilter.district = district;
+}
+
+if (config.city) {
+    masterFilter.city = city;
+}
     const masterConstituencies = await MasterConstituency.find(masterFilter).lean();
-    const masters = await MasterConstituency.find({
-    electionType: election.electionType,
-    state: election.state,
-    city: election.city || null,
-});
+    console.log("Found:", masterConstituencies.length);
 
 
 
@@ -33,13 +86,16 @@ router.post('/', async (req, res) => {
       await Constituency.insertMany(masterConstituencies.map((master) => ({
         electionId: election._id,
         election: election._id,
-        constituencyNumber: master.constituencyNumber,
-        constituencyName: master.constituencyName,
-        active: master.active,
-        // Keep existing required fields populated for the rest of the app.
         name: master.constituencyName,
-        district: master.city || city || state,
-        state: master.state,
+
+state: master.state,
+district: master.district,
+city: master.city,
+
+constituencyNumber: master.constituencyNumber,
+constituencyName: master.constituencyName,
+active: master.active,
+        
       })));
     }
     res.status(201).json(election);

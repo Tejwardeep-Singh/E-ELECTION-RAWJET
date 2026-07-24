@@ -9,6 +9,7 @@ const moment = require('moment-timezone');
 const authenticate = require('../middlewares/authenticate');
 const authorizeHead = require('../middlewares/authorizeHead');
 const { validateElectionAssignment } = require('../services/electionScope');
+const electionConfigs = require("../config/electionConfig");
 
 router.use(authenticate, authorizeHead);
 
@@ -16,32 +17,76 @@ router.post("/add", async (req, res) => {
   try {
     const { userId, name, password, electionId, constituencyId } = req.body;
 
-    const { constituency } = await validateElectionAssignment(electionId, constituencyId);
-    const address = { state: constituency.state, city: constituency.district };
+    // Validate election & constituency
+    const { election, constituency } = await validateElectionAssignment(
+      electionId,
+      constituencyId
+    );
+    const config = electionConfigs[election.type];
 
-    if (!address?.state || !address?.city) {
-      return res.status(400).json({ message: 'Selected constituency has incomplete location data' });
+    if (!config) {
+      return res.status(400).json({
+        message: "Invalid election type",
+      });
+    }
+
+    // Validate location data according to election type
+    if (config.state && !constituency.state) {
+      return res.status(400).json({
+        message: "Selected constituency is missing state information",
+      });
+    }
+
+    if (config.district && !constituency.district) {
+      return res.status(400).json({
+        message: "Selected constituency is missing district information",
+      });
+    }
+
+    if (config.city && !constituency.city) {
+      return res.status(400).json({
+        message: "Selected constituency is missing city information",
+      });
     }
 
     const existingAdmin = await Admin.findOne({ userId });
+
     if (existingAdmin) {
-      return res.status(400).json({ message: "Admin with this User ID already exists." });
+      return res.status(400).json({
+        message: "Admin with this User ID already exists.",
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    const address = {
+      state: constituency.state || null,
+      district: constituency.district || null,
+      city: constituency.city || null,
+    };
 
     const newAdmin = new Admin({
       userId,
       name,
       password: hashedPassword,
-      address, electionId, constituencyId,
+      address,
+      electionId,
+      constituencyId,
     });
 
     await newAdmin.save();
-    res.status(201).json({ message: "Admin created successfully" });
+
+    res.status(201).json({
+      message: "Admin created successfully",
+      admin: newAdmin,
+    });
+
   } catch (err) {
     console.error("Error creating admin:", err);
-    res.status(400).json({ message: err.message || 'Invalid administrator assignment' });
+
+    res.status(400).json({
+      message: err.message || "Invalid administrator assignment",
+    });
   }
 });
 router.get('/candidates/:area', async (req, res) => {
