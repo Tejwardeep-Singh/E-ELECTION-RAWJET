@@ -58,8 +58,15 @@ router.get('/candidates/:area', async (req, res) => {
   }
 });
 router.get("/view", async (req, res) => {
-  const admins = await Admin.find();
-  res.json(admins);
+  try {
+    const admins = await Admin.find()
+      .populate("electionId", "title type status")
+      .populate("constituencyId", "constituencyNumber constituencyName");
+
+    res.json(admins);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 router.delete("/delete/:id", async (req, res) => {
   await Admin.findByIdAndDelete(req.params.id);
