@@ -16,6 +16,13 @@ const masterConstituencySchema = new mongoose.Schema(
       index: true,
     },
 
+    district: {
+      type: String,
+      default: null,
+      trim: true,
+      index: true,
+    },
+
     city: {
       type: String,
       default: null,
@@ -32,14 +39,15 @@ const masterConstituencySchema = new mongoose.Schema(
         "Assembly",
         "Lok Sabha",
         "Student Council",
-        "Other"
-        ],
+        "Other",
+      ],
+      required: true,
       index: true,
     },
 
     constituencyNumber: {
       type: Number,
-      default: null,
+      required: true,
     },
 
     constituencyName: {
@@ -58,24 +66,23 @@ const masterConstituencySchema = new mongoose.Schema(
   }
 );
 
-// Prevent duplicate constituencies
 masterConstituencySchema.index(
   {
     electionType: 1,
     state: 1,
+    district: 1,
     city: 1,
     constituencyNumber: 1,
   },
   {
     unique: true,
-    sparse: true,
   }
 );
 
-// Fast searching
 masterConstituencySchema.index({
   electionType: 1,
   state: 1,
+  district: 1,
   city: 1,
   active: 1,
 });

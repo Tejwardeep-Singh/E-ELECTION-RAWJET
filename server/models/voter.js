@@ -1,80 +1,83 @@
 const mongoose = require("mongoose");
 
-const voterSchema = mongoose.Schema({
-    epicNumber:{
-        type:String,
-        required:true,
-        unique:true,
-        trim: true,
-        uppercase: true,
+const voterSchema = new mongoose.Schema(
+  {
+    epicNumber: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      uppercase: true,
     },
-    userId:{
-        type:String,
-        required:true,
-        unique:true,
+
+    userId: {
+      type: String,
+      required: true,
+      unique: true,
     },
-    name:{
-        type:String,
-        required:true,
+
+    name: {
+      type: String,
+      required: true,
+      trim: true,
     },
-    address: {
-        area: {
-            type: String,
-            required: true,
-        },
-        city: {
-            type: String,
-        },
-        state: {
-            type: String,
-        },
+
+    masterConstituency: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "MasterConstituency",
+      required: true,
+      index: true,
     },
-    password:{
-        type:String,
-        required:true,
+
+    password: {
+      type: String,
+      required: true,
     },
+
     mustChangePassword: {
-        type: Boolean,
-        default: true,
+      type: Boolean,
+      default: true,
     },
+
     photoUrl: {
-        type: String
+      type: String,
     },
-    // The biometric template itself lives in the internal-only FaceProfile
-    // collection. This flag lets future flows determine whether enrollment
-    // succeeded without reading or exposing that template.
+
+    // Indicates whether the voter's facial biometric
+    // has been successfully enrolled.
     faceEnrolled: {
-        type: Boolean,
-        default: false,
+      type: Boolean,
+      default: false,
     },
+
     votingStatus: {
-        type: String,
-        enum: ["not_voted", "verified", "voted"],
-        default: "not_voted",
+      type: String,
+      enum: ["not_voted", "verified", "voted"],
+      default: "not_voted",
     },
+
     lastVerification: {
-        success: Boolean,
-        confidence: Number,
-        time: Date,
+      success: Boolean,
+      confidence: Number,
+      time: Date,
     },
+
     status: {
-        type: String,
-        enum: ["active", "inactive", "suspended"],
-        default: "active",
+      type: String,
+      enum: ["active", "inactive", "suspended"],
+      default: "active",
     },
+
     electionId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Election',
-        required: true,
-        index: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Election",
+      required: true,
+      index: true,
     },
-    constituencyId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Constituency',
-        required: true,
-        index: true,
-    },
-}, {
+  },
+  {
     timestamps: true,
-});
-module.exports = mongoose.model("voter",voterSchema);
+  }
+);
+
+module.exports = mongoose.model("Voter", voterSchema);
