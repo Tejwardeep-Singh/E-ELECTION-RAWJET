@@ -104,7 +104,8 @@ router.get('/candidates/:area', async (req, res) => {
 });
 router.get("/view", async (req, res) => {
   try {
-    const admins = await Admin.find()
+    const filter = req.query.electionId ? { electionId: req.query.electionId } : {};
+    const admins = await Admin.find(filter)
       .populate("electionId", "title type status")
       .populate("constituencyId", "constituencyNumber constituencyName");
 

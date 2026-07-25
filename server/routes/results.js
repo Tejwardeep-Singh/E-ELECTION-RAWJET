@@ -20,6 +20,9 @@ router.get('/', async (req, res) => {
     const area = req.query.area;
 
     let filter = {};
+    if (req.query.electionId) {
+      filter.electionId = req.query.electionId;
+    }
     if (area) {
       filter.area = area;
     }

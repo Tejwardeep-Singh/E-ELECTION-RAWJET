@@ -1,14 +1,17 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-mongoose.connect(process.env.MONGO_URI, {
-  dbName: 'E-Election',
-  serverSelectionTimeoutMS: 5000,
-})
-.then(() => {
-  console.log("💾 MongoDB Connected Successfully 🚀");
-})
-.catch((err) => {
-  console.error("❌ MongoDB connection error:", err);
-  process.exit(1);  // Stop server if DB fails
-});
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      dbName: "E-Election",
+      serverSelectionTimeoutMS: 5000,
+    });
 
+    console.log("✅ MongoDB Connected Successfully");
+  } catch (err) {
+    console.error("❌ MongoDB Connection Error:", err);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
