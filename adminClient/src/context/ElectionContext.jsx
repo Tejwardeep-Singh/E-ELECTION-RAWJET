@@ -9,16 +9,35 @@ export function ElectionProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   const refreshElections = useCallback(async () => {
-    setLoading(true);
-    try {
-      const elections = await api('/api/head/elections', { role: 'head' });
-      setAvailableElections(elections);
-      setSelectedElection((current) => current && elections.find((election) => election._id === current._id) || null);
-      return elections;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const headToken = localStorage.getItem("headToken");
+
+  if (!headToken) {
+    setAvailableElections([]);
+    setSelectedElection(null);
+    setLoading(false);
+    return [];
+  }
+
+  setLoading(true);
+
+  try {
+    const elections = await api("/api/head/elections", {
+      role: "head",
+    });
+
+    setAvailableElections(elections);
+
+    setSelectedElection((current) =>
+      current
+        ? elections.find((e) => e._id === current._id) || null
+        : null
+    );
+
+    return elections;
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
   useEffect(() => { refreshElections().catch(() => setAvailableElections([])); }, [refreshElections]);
 
