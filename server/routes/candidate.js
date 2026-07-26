@@ -76,24 +76,87 @@ router.post('/candidate/add', upload.fields([
 ]), async (req, res) => {
   try {
     const { id, name, criminalCase } = req.body;
-    const constituency = req.user.role === 'admin'
-      ? await Constituency.findOne({ _id: req.admin.constituencyId, electionId: req.admin.electionId })
-      : null;
-    const address = req.user.role === 'admin'
-      ? { state: constituency?.state, city: constituency?.district, area: constituency?.name }
-      : parseAddress(req.body.address);
+    let constituency = null;
+let election = null;
+
+if (req.user.role === "admin") {
+  [constituency, election] = await Promise.all([
+    Constituency.findOne({
+      _id: req.admin.constituencyId,
+      electionId: req.admin.electionId,
+    }),
+    Election.findById(req.admin.electionId),
+  ]);
+}
+    const address =
+  req.user.role === "admin"
+    ? {
+        state: constituency?.state || null,
+        district: constituency?.district || null,
+        city: constituency?.city || null,
+        area: constituency?.name || constituency?.constituencyName || null,
+      }
+    : parseAddress(req.body.address);
     const candidateImage = req.files?.candidateImage?.[0]?.path;
     const partyImage = req.files?.partyImage?.[0]?.path;
 
-    if (!id || !name || !address?.state || !address?.city || !address?.area || !candidateImage || !partyImage) {
-      return res.status(400).json({ error: 'Candidate details, jurisdiction, and both images are required' });
-    }
+    if (!id || !name || !candidateImage || !partyImage) {
+  return res.status(400).json({
+    error: "Candidate ID, name and both images are required",
+  });
+}
+
+if (!address?.state || !address?.area) {
+  return res.status(400).json({
+    error: "Unable to determine the assigned constituency.",
+  });
+}
+
+if (election) {
+  switch (election.type) {
+    case "Municipal":
+      if (!address.city) {
+        return res.status(400).json({
+          error: "Assigned constituency has no city.",
+        });
+      }
+      break;
+
+    case "District":
+      if (!address.district) {
+        return res.status(400).json({
+          error: "Assigned constituency has no district.",
+        });
+      }
+      break;
+
+    case "Panchayat":
+      if (!address.district || !address.city) {
+        return res.status(400).json({
+          error: "Assigned constituency is incomplete.",
+        });
+      }
+      break;
+  }
+}
 
     await new Candidate({
-      id, name, address, candidateImage, partyImage, criminalCase: criminalCase || '', voteCount: 0,
-      electionId: req.user.role === 'admin' ? req.admin.electionId : req.body.electionId,
-      constituencyId: req.user.role === 'admin' ? req.admin.constituencyId : req.body.constituencyId,
-    }).save();
+  id,
+  name,
+  address,
+  candidateImage,
+  partyImage,
+  criminalCase: criminalCase || "",
+  voteCount: 0,
+  electionId:
+    req.user.role === "admin"
+      ? req.admin.electionId
+      : req.body.electionId,
+  constituencyId:
+    req.user.role === "admin"
+      ? req.admin.constituencyId
+      : req.body.constituencyId,
+}).save();
     res.status(201).json({ message: 'Candidate added successfully' });
   } catch (error) {
     res.status(500).json({ error: error.code === 11000 ? 'Candidate ID already exists' : 'Internal Server Error' });

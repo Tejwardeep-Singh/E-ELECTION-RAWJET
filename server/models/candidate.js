@@ -12,10 +12,11 @@ const candidateSchema = mongoose.Schema({
 
     },
     address: {
-        state: { type: String, required: true },
-        city: { type: String, required: true },
-        area: { type: String, required: true },
-    },
+  state: String,
+  district: String,
+  city: String,
+  area: String,
+},
     candidateImage:{
         type:String,
         required:true,

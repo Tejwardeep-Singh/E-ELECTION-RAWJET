@@ -14,7 +14,8 @@ router.post("/candidate/add", upload.fields([
   
       const candidateImage = req.files['candidateImage']?.[0]?.path;
       const partyImage = req.files['partyImage']?.[0]?.path;
-  
+      console.log("Body:", req.body);
+console.log("Files:", req.files);
       if (!candidateImage || !partyImage) {
         return res.status(400).json({ error: "Both images are required" });
       }
