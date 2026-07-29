@@ -43,10 +43,14 @@ async function importVoters() {
         const votersToInsert = [];
         for (const voter of voters) {
             console.log(`Processing ${voter.epicNumber}...`);
+            console.log("EPIC:", voter.epicNumber);
+console.log("DOB Value:", voter.dob);
+console.log("DOB Type:", typeof voter.dob);
             const defaultPassword = generateDefaultPassword(
                 voter.epicNumber,
                 voter.dob
             );
+            console.log("Generated:", defaultPassword);
             const hashedPassword =
                 await hashPassword(defaultPassword);
             const photo =
