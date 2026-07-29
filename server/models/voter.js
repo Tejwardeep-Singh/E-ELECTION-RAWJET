@@ -22,12 +22,28 @@ const voterSchema = new mongoose.Schema(
       trim: true,
     },
 
-    masterConstituency: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "MasterConstituency",
-      required: true,
-      index: true,
-    },
+    constituencies: {
+  municipal: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "MasterConstituency",
+    required: true,
+    index: true,
+  },
+
+  assembly: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "MasterConstituency",
+    required: true,
+    index: true,
+  },
+
+  lokSabha: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "MasterConstituency",
+    required: true,
+    index: true,
+  },
+},
 
     password: {
       type: String,
@@ -39,28 +55,102 @@ const voterSchema = new mongoose.Schema(
       default: true,
     },
 
-    photoUrl: {
-      type: String,
-    },
+    photo: {
+      original: {
+          type: String,
+          default: "",
+      },
 
-    // Indicates whether the voter's facial biometric
-    // has been successfully enrolled.
-    faceEnrolled: {
+      processed: {
+          type: String,
+          default: "",
+      },
+
+      uploadedAt: {
+          type: Date,
+      },
+  },
+
+      biometric: {
+    enrolled: {
       type: Boolean,
       default: false,
     },
 
-    votingStatus: {
+    faceEmbeddingPath: {
       type: String,
-      enum: ["not_voted", "verified", "voted"],
-      default: "not_voted",
+      default: "",
+      select: false,
     },
 
-    lastVerification: {
-      success: Boolean,
-      confidence: Number,
-      time: Date,
+    modelVersion: {
+      type: String,
+      default: "InsightFace-v1",
     },
+
+    enrolledAt: Date,
+  },
+      votingStatus: {
+        type: String,
+        enum: ["not_voted", "verified", "voted"],
+        default: "not_voted",
+      },
+
+      lastVerification: {
+    success: {
+      type: Boolean,
+      default: false,
+    },
+
+    confidence: {
+      type: Number,
+      default: 0,
+    },
+
+    time: Date,
+
+    method: {
+      type: String,
+      enum: ["face", "manual"],
+      default: "face",
+    },
+  },
+  dateOfBirth: {
+    type: Date,
+    required: true,
+},
+gender: {
+    type: String,
+    enum: ["Male", "Female", "Other"],
+    required: true,
+},
+
+guardianName: {
+    type: String,
+    required: true,
+    trim: true,
+},
+
+mobile: {
+    type: String,
+    required: true,
+    trim: true,
+},
+
+address: {
+
+    state: String,
+
+    district: String,
+
+    city: String,
+
+    houseNo: String,
+
+    street: String,
+
+    pincode: String,
+},
 
     status: {
       type: String,
@@ -79,5 +169,19 @@ const voterSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+voterSchema.index({
+  electionId: 1,
+  "constituencies.municipal": 1,
+});
+
+voterSchema.index({
+  electionId: 1,
+  "constituencies.assembly": 1,
+});
+
+voterSchema.index({
+  electionId: 1,
+  "constituencies.lokSabha": 1,
+});
 
 module.exports = mongoose.model("Voter", voterSchema);
