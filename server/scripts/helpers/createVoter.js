@@ -1,11 +1,7 @@
 function createVoter({
     voter,
     password,
-    electionId,
-    municipal,
-    assembly,
-    lokSabha,
-    photoPath,
+    photo
 }) {
 
     const [day, month, year] = voter.dob.split("/");
@@ -28,11 +24,9 @@ function createVoter({
 
         constituencies: {
 
-            municipal: municipal._id,
-
-            assembly: assembly._id,
-
-            lokSabha: lokSabha._id,
+            municipal: voter.municipalDoc._id,
+            assembly: voter.assemblyDoc._id,
+            lokSabha: voter.lokSabhaDoc._id,
 
         },
 
@@ -56,16 +50,7 @@ function createVoter({
 
         mustChangePassword: true,
 
-        photo: {
-
-            original: photoPath,
-
-            processed: "",
-
-            uploadedAt: new Date(),
-
-        },
-
+        photo,
         biometric: {
 
             enrolled: false,
@@ -93,8 +78,6 @@ function createVoter({
         },
 
         status: voter.status.toLowerCase(),
-
-        electionId,
 
     };
 

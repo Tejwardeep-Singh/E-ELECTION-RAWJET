@@ -1,9 +1,9 @@
-function generateDefaultPassword(epicNumber, dob) {
+function generateDefaultPassword(epicNumber, dobString) {
     const prefix = epicNumber.substring(0, 5).toUpperCase();
 
-    const day = String(dob.getDate()).padStart(2, "0");
-    const month = String(dob.getMonth() + 1).padStart(2, "0");
-    const year = dob.getFullYear();
+    const separator = dobString.includes("/") ? "/" : "-";
+
+    const [day, month, year] = dobString.split(separator);
 
     return `${prefix}${day}${month}${year}`;
 }

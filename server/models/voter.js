@@ -156,14 +156,7 @@ address: {
       type: String,
       enum: ["active", "inactive", "suspended"],
       default: "active",
-    },
-
-    electionId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Election",
-      required: true,
-      index: true,
-    },
+    }
   },
   {
     timestamps: true,
