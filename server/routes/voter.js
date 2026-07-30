@@ -111,18 +111,26 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid token' });
     }
   }
-  router.get('/me', authenticateVoter, async (req, res) => {
+router.get("/me", authenticateVoter, async (req, res) => {
     try {
-      // Explicitly exclude the legacy field as well as the password. New
-      // embeddings live only in FaceProfile, which has no public route.
-      const voter = await Voter.findById(req.voterId).select('-password -faceEmbedding');
-      if (!voter) return res.status(404).json({ message: 'Voter not found' });
-      res.json(voter);
+
+        const voter = await Voter.findById(req.voterId)
+            .populate("constituencies.municipal", "constituencyName type")
+            .populate("constituencies.assembly", "constituencyName type")
+            .populate("constituencies.lokSabha", "constituencyName type")
+            .select("-password -faceEmbedding");
+
+        if (!voter)
+            return res.status(404).json({ message: "Voter not found" });
+          console.log(voter.photoUrl);
+console.log(voter.photo);
+        res.json(voter);
+
     } catch (err) {
-      console.error('Error fetching voter:', err);
-      res.status(500).json({ message: 'Server error' });
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
     }
-  });
+});
   router.post('/vote/:candidateId', authenticateVoter, async (req, res) => {
     try {
       const voter = await Voter.findById(req.voterId);
