@@ -19,37 +19,82 @@ export default function VoterDashboard() {
   const headers = useMemo(() => ({ Authorization: `Bearer ${token}` }), [token]);
   const [voter, setVoter] = useState(null);
   const [candidates, setCandidates] = useState([]);
-  const [selectedConstituency, setSelectedConstituency] = useState('');
+  const [elections, setElections] = useState([]);
+  const [selectedElection, setSelectedElection] = useState("");
   const [loading, setLoading] = useState(true);
   const [candidatesLoading, setCandidatesLoading] = useState(false);
   const [updatingPhoto, setUpdatingPhoto] = useState(false);
   const [modalConfig, setModalConfig] = useState({ isOpen: false, title: '', description: '', candidateId: null, candidateName: '' });
   const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'success', message: '' });
-
+  
   const triggerAlert = (type, message) => setAlertConfig({ isOpen: true, type, message });
 
   const loadCandidates = useCallback(async () => {
-    setCandidatesLoading(true);
-    try {
-      // /results is the only voter-scoped candidate endpoint currently available.
-      const response = await axios.get(`${API_URL}/api/voter/results`, { headers });
-      setCandidates(response.data.candidates || []);
-    } catch (error) {
-      setCandidates([]);
-      triggerAlert('error', error.response?.data?.message || 'Unable to load candidates for your registered ballot.');
-    } finally {
-      setCandidatesLoading(false);
-    }
-  }, [headers]);
 
+    if (!selectedElection) return;
+
+    setCandidatesLoading(true);
+
+    try {
+
+        const response = await axios.get(
+            `${API_URL}/api/voter/candidates/${selectedElection}`,
+            { headers }
+        );
+
+        setCandidates(response.data.candidates || []);
+
+    } catch (error) {
+
+        setCandidates([]);
+
+        triggerAlert(
+            "error",
+            error.response?.data?.message || "Unable to load candidates."
+        );
+
+    } finally {
+
+        setCandidatesLoading(false);
+
+    }
+
+}, [headers, selectedElection]);
+useEffect(() => {
+
+    if (selectedElection) {
+        loadCandidates();
+    }
+
+}, [selectedElection, loadCandidates]);
+
+  const loadElections = useCallback(async () => {
+  try {
+    const response = await axios.get(
+      `${API_URL}/api/voter/elections`,
+      { headers }
+    );
+
+    setElections(response.data);
+
+    if (response.data.length > 0) {
+      setSelectedElection(response.data[0]._id);
+    }
+
+  } catch (error) {
+    triggerAlert(
+      "error",
+      error.response?.data?.message || "Unable to load elections."
+    );
+  }
+}, [headers]);
   useEffect(() => {
     const loadDashboard = async () => {
       setLoading(true);
       try {
         const response = await axios.get(`${API_URL}/api/voter/me`, { headers });
         setVoter(response.data);
-        const firstConstituency = constituencyDetails(response.data)[0]?.[1];
-        setSelectedConstituency(firstConstituency?._id || '');
+        await loadElections();
       } catch (error) {
         triggerAlert('error', error.response?.data?.message || 'Unable to load your voter profile.');
       } finally {
@@ -104,9 +149,36 @@ export default function VoterDashboard() {
     
     </div><div className="flex-1"><span className="text-[10px] font-mono font-bold text-blue-600 uppercase tracking-widest">Authorized Constituent Profile</span><h1 className="mt-1 text-2xl font-black tracking-tight text-[#0F172A]">{voter.name}</h1>{updatingPhoto && <p className="mt-1 text-[10px] text-blue-600 font-bold animate-pulse">Uploading new profile image asset...</p>}<div className="mt-4 grid gap-3 sm:grid-cols-2">{details.map(([label, value]) => <div key={label} className="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[10px] uppercase font-bold tracking-wide text-slate-400">{label}</p><p className="mt-0.5 text-xs font-semibold text-slate-700 break-words">{value || 'Not available'}</p></div>)}</div></div><div className={`self-start px-4 py-3 rounded-2xl border text-center ${hasVoted ? 'bg-emerald-50/50 border-emerald-100/60 text-emerald-800' : 'bg-amber-50 border-amber-100 text-amber-800'}`}><div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider"><ShieldCheck size={13} />{hasVoted ? 'Ballot Submitted' : 'Ballot Pending'}</div></div></div></section>}
 
-    <section className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm"><div className="flex items-start gap-3"><MapPin className="mt-0.5 text-blue-600" size={19} /><div><h2 className="font-black text-[#0F172A]">Assigned constituencies</h2><p className="mt-1 text-xs text-[#64748B]">Assignments returned by your authenticated voter profile.</p></div></div><div className="mt-4 grid gap-3 md:grid-cols-3">{constituencies.map(([label, constituency]) => <div key={label} className="rounded-2xl border border-slate-200 p-4"><p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{label}</p><p className="mt-1 text-sm font-bold text-slate-800">{constituency.constituencyName || constituency.name || 'Not available'}</p></div>)}{!constituencies.length && <p className="text-sm text-slate-500">No constituency assignments were returned for this voter.</p>}</div></section>
+    <section className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm"><div className="flex items-start gap-3"><MapPin className="mt-0.5 text-blue-600" size={19} /><div><h2 className="font-black text-[#0F172A]">Your constituencies</h2><p className="mt-1 text-xs text-[#64748B]">Constituencies based on different election scales.</p></div></div><div className="mt-4 grid gap-3 md:grid-cols-3">{constituencies.map(([label, constituency]) => <div key={label} className="rounded-2xl border border-slate-200 p-4"><p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{label}</p><p className="mt-1 text-sm font-bold text-slate-800">{constituency.constituencyName || constituency.name || 'Not available'}</p></div>)}{!constituencies.length && <p className="text-sm text-slate-500">No constituency assignments were returned for this voter.</p>}</div></section>
 
-    <section className="space-y-4"><div className="border-b border-slate-200 pb-3"><h2 className="text-xl font-black text-[#0F172A] tracking-tight">Candidates in Your Constituency</h2><p className="text-xs font-medium text-[#64748B] mt-0.5">Candidates are loaded from your authenticated voter ballot response.</p></div><label className="block max-w-md text-xs font-bold uppercase tracking-wide text-slate-500">Eligible constituency<select value={selectedConstituency} onChange={(event) => setSelectedConstituency(event.target.value)} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700">{constituencies.map(([, constituency]) => <option key={constituency._id} value={constituency._id}>{constituency.constituencyName || constituency.name}</option>)}{!constituencies.length && <option value="">No eligible constituency available</option>}</select></label>{candidatesLoading ? <div className="py-12 text-center text-xs font-bold uppercase tracking-wider text-slate-400">Loading eligible candidates…</div> : candidates.length === 0 ? <div className="text-center py-12 bg-white border border-slate-200/60 rounded-2xl text-[#64748B] text-xs font-bold uppercase tracking-wider">No candidate records are available for your registered ballot.</div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{candidates.map((candidate) => <article key={candidate._id} className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-xs flex flex-col justify-between gap-6"><div className="space-y-4"><div className="flex items-start justify-between gap-4"><div><h3 className="text-lg font-black text-[#0F172A]">{candidate.name}</h3><span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1"><Gavel size={12} />Disclosures: {candidate.criminalCase || 'None'}</span></div>{candidate.partyImage ? <img src={candidate.partyImage} alt="Party emblem" className="w-10 h-10 object-contain bg-slate-50 border border-slate-100 p-1 rounded-xl" /> : <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-300"><ImageIcon size={14} /></div>}</div>{candidate.candidateImage && <img src={candidate.candidateImage} alt={`${candidate.name} portrait`} className="w-full h-32 rounded-2xl object-cover bg-slate-50 border border-slate-100" />}</div>{hasVoted ? <div className="w-full text-center py-2 bg-slate-50 border border-slate-200/60 text-slate-400 text-[10px] font-bold uppercase tracking-wider rounded-xl">Voting Locked</div> : <button onClick={() => handleVoteConfirmation(candidate._id, candidate.name)} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold text-xs rounded-xl py-2.5 shadow-sm uppercase tracking-wider"><Vote size={14} />Cast Vote for {candidate.name}</button>}</article>)}</div>}</section>
+    <section className="space-y-4"><div className="border-b border-slate-200 pb-3"><h2 className="text-xl font-black text-[#0F172A] tracking-tight">Election Candidates</h2><p className="text-xs font-medium text-[#64748B] mt-0.5">Select an election to view the candidates you are eligible to vote for.</p></div>
+    <label className="block max-w-md text-xs font-bold uppercase tracking-wide text-slate-500">
+    Election
+
+    <select
+        value={selectedElection}
+        onChange={(event) =>
+            setSelectedElection(event.target.value)
+        }
+        className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-700"
+    >
+        {elections.map((election) => (
+            <option
+                key={election._id}
+                value={election._id}
+            >
+                {election.title}
+            </option>
+        ))}
+
+        {!elections.length && (
+            <option value="">
+                No elections available
+            </option>
+        )}
+    </select>
+</label>
+    {candidatesLoading ? <div className="py-12 text-center text-xs font-bold uppercase tracking-wider text-slate-400">Loading election candidates...</div> : candidates.length === 0 ? <div className="text-center py-12 bg-white border border-slate-200/60 rounded-2xl text-[#64748B] text-xs font-bold uppercase tracking-wider">No candidates are available for the selected election.</div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{candidates.map((candidate) => <article key={candidate._id} className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-xs flex flex-col justify-between gap-6"><div className="space-y-4"><div className="flex items-start justify-between gap-4"><div><h3 className="text-lg font-black text-[#0F172A]">{candidate.name}</h3><span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1"><Gavel size={12} />Disclosures: {candidate.criminalCase || 'None'}</span></div>{candidate.partyImage ? <img src={candidate.partyImage} alt="Party emblem" className="w-10 h-10 object-contain bg-slate-50 border border-slate-100 p-1 rounded-xl" /> : <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-300"><ImageIcon size={14} /></div>}</div>{candidate.candidateImage && <img src={candidate.candidateImage} alt={`${candidate.name} portrait`} className="w-full h-32 rounded-2xl object-cover bg-slate-50 border border-slate-100" />}</div>{hasVoted ? <div className="w-full text-center py-2 bg-slate-50 border border-slate-200/60 text-slate-400 text-[10px] font-bold uppercase tracking-wider rounded-xl">Voting Locked</div> : <button onClick={() => handleVoteConfirmation(candidate._id, candidate.name)} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold text-xs rounded-xl py-2.5 shadow-sm uppercase tracking-wider"><Vote size={14} />Cast Vote for {candidate.name}</button>}</article>)}</div>}</section>
     <button onClick={() => navigate('/voter/results')} className="w-full inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-widest shadow-sm"><BarChart3 size={15} />View Verified Election Results Portal</button>
   </div>
   {modalConfig.isOpen && <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs"><div className="w-full max-w-md bg-white border border-slate-200/80 rounded-3xl p-6 md:p-8 shadow-lg space-y-6 text-center"><div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center mx-auto"><Vote size={22} /></div><div><h3 className="text-lg font-black text-slate-900">{modalConfig.title}</h3><p className="mt-1.5 text-xs font-medium text-slate-500 leading-relaxed">{modalConfig.description}</p></div><div className="flex gap-3"><button onClick={() => setModalConfig((current) => ({ ...current, isOpen: false }))} className="w-1/2 bg-white border border-slate-200 text-slate-700 text-xs font-bold uppercase rounded-xl py-3">Cancel</button><button onClick={executeVote} className="w-1/2 bg-blue-600 text-white text-xs font-bold uppercase rounded-xl py-3">Sign & Transmit Ballot</button></div></div></div>}

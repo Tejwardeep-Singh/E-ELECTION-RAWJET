@@ -4,19 +4,12 @@ const candidateSchema = mongoose.Schema({
     id:{
         type:Number,
         required:true,
-        unique:true,
     },
     name:{
         type:String,
         required:true,
 
     },
-    address: {
-  state: String,
-  district: String,
-  city: String,
-  area: String,
-},
     candidateImage:{
         type:String,
         required:true,
@@ -44,6 +37,6 @@ const candidateSchema = mongoose.Schema({
         index: true,
     },
     
-});
+},{timestamps: true,});
 candidateSchema.index({ electionId: 1, id: 1 }, { unique: true });
 module.exports = mongoose.model("candidate",candidateSchema);

@@ -7,6 +7,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { voterUpload } = require("../config/cloudinaryUpload");
 const { enrollVoterFace } = require('../services/faceEnrollment');
+const Election = require("../models/election");
+const Constituency = require("../models/constituency");
 
 const uploadVoterImage = (req, res, next) => {
 
@@ -153,21 +155,177 @@ console.log(voter.photo);
       res.status(500).json({ message: 'Server error' });
     }
   });
-router.get('/results', authenticateVoter, async (req, res) => {
+
+
+router.get("/results/:electionId", authenticateVoter, async (req, res) => {
   try {
+    const { electionId } = req.params;
+
     const voter = await Voter.findById(req.voterId);
-    if (!voter) return res.status(404).json({ message: 'Voter not found' });
+
+    if (!voter) {
+      return res.status(404).json({
+        message: "Voter not found",
+      });
+    }
+
+    const election = await Election.findById(electionId);
+
+    if (!election) {
+      return res.status(404).json({
+        message: "Election not found",
+      });
+    }
+
+    let constituencyId = null;
+
+    switch (election.type) {
+      case "Lok Sabha":
+        constituencyId = voter.constituencies?.lokSabha;
+        break;
+
+      case "Assembly":
+        constituencyId = voter.constituencies?.assembly;
+        break;
+
+      case "Municipal":
+        constituencyId = voter.constituencies?.municipal;
+        break;
+
+      default:
+        return res.status(400).json({
+          message: `Unsupported election type: ${election.type}`,
+        });
+    }
+
+    if (!constituencyId) {
+      return res.status(404).json({
+        message: "You are not assigned to a constituency for this election.",
+      });
+    }
 
     const candidates = await Candidate.find({
-      'address.state': voter.address.state,
-      'address.city': voter.address.city,
-      'address.area': voter.address.area,
+      electionId: election._id,
+      constituencyId,
     }).sort({ voteCount: -1 });
 
-    res.json({ address: voter.address, candidates });
+    res.json({
+      election: {
+        _id: election._id,
+        title: election.title,
+        type: election.type,
+        status: election.status,
+      },
+      candidates,
+    });
+
   } catch (err) {
-    console.error('Error fetching results:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching candidates:", err);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+});
+// GET /api/voter/elections
+router.get("/elections", authenticateVoter, async (req, res) => {
+  try {
+    const elections = await Election.find({
+      status: { $in: ["Draft", "Active"] },
+    })
+      .select(
+        "_id title type status startTime endTime state district city createdAt"
+      )
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(elections);
+
+  } catch (err) {
+    console.error("Error fetching elections:", err);
+
+    res.status(500).json({
+      message: "Failed to fetch elections.",
+    });
+  }
+});
+router.get("/candidates/:electionId", authenticateVoter, async (req, res) => {
+  try {
+    const voter = await Voter.findById(req.voterId);
+
+    if (!voter) {
+      return res.status(404).json({
+        message: "Voter not found",
+      });
+    }
+
+    const election = await Election.findById(req.params.electionId);
+
+    if (!election) {
+      return res.status(404).json({
+        message: "Election not found",
+      });
+    }
+
+    let constituencyId = null;
+
+    switch (election.type) {
+      case "Lok Sabha":
+        constituencyId = voter.constituencies?.lokSabha;
+        break;
+
+      case "Assembly":
+        constituencyId = voter.constituencies?.assembly;
+        break;
+
+      case "Municipal":
+        constituencyId = voter.constituencies?.municipal;
+        break;
+
+      default:
+        return res.status(400).json({
+          message: "Unsupported election type",
+        });
+    }
+
+    if (!constituencyId) {
+      return res.status(404).json({
+        message: "Constituency not assigned.",
+      });
+    }
+    
+
+    const electionConstituency = await Constituency.findOne({
+  electionId: election._id,
+  masterConstituencyId: constituencyId,
+});
+
+if (!electionConstituency) {
+  return res.status(404).json({
+    message: "Constituency not found for this election.",
+  });
+}
+
+const candidates = await Candidate.find({
+  electionId: election._id,
+  constituencyId: electionConstituency._id,
+})
+  .populate(
+    "constituencyId",
+    "constituencyName constituencyNumber"
+  )
+  .sort({ name: 1 });
+  console.log("Master Constituency:", constituencyId);
+console.log("Election Constituency:", electionConstituency);
+    res.json({
+      election,
+      candidates,
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Server error",
+    });
   }
 });
 router.put(

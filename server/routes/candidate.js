@@ -163,13 +163,39 @@ if (election) {
   }
 });
 
-router.get('/candidate/view', async (req, res) => {
-  try {
-    res.json(await Candidate.find(scopeFor(req)));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+router.get(
+  "/candidate/view",
+  authenticate,
+  allowHeadOrAdmin,
+  async (req, res) => {
+    try {
+      if (req.user.role === "admin") {
+        await loadAdmin(req, res, async () => {
+          const candidates = await Candidate.find(scopeFor(req))
+            .populate(
+              "constituencyId",
+              "constituencyName constituencyNumber state district city"
+            )
+            .populate("electionId", "title type");
+
+          res.json(candidates);
+        });
+      } else {
+        const candidates = await Candidate.find({})
+          .populate(
+            "constituencyId",
+            "constituencyName constituencyNumber state district city"
+          )
+          .populate("electionId", "title type");
+
+        res.json(candidates);
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
   }
-});
+);
 
 router.put('/candidate/edit/:id', upload.single('candidateImage'), async (req, res) => {
   try {

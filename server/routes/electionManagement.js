@@ -83,20 +83,27 @@ if (config.city) {
 
 
     if (masterConstituencies.length) {
-      await Constituency.insertMany(masterConstituencies.map((master) => ({
-        electionId: election._id,
-        election: election._id,
-        name: master.constituencyName,
+      await Constituency.insertMany(
+  masterConstituencies.map((master) => ({
+    // NEW
+    masterConstituencyId: master._id,
 
-state: master.state,
-district: master.district,
-city: master.city,
+    // Existing
+    electionId: election._id,
+    election: election._id,
 
-constituencyNumber: master.constituencyNumber,
-constituencyName: master.constituencyName,
-active: master.active,
-        
-      })));
+    name: master.constituencyName,
+
+    state: master.state,
+    district: master.district,
+    city: master.city,
+
+    constituencyNumber: master.constituencyNumber,
+    constituencyName: master.constituencyName,
+
+    active: master.active,
+  }))
+);
     }
     res.status(201).json(election);
   } catch (error) { res.status(400).json({ message: error.message }); }

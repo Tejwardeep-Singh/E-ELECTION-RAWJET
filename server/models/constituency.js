@@ -27,7 +27,11 @@ const constituencySchema = new mongoose.Schema(
         trim: true,
         default: null,
     },
-
+    masterConstituencyId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "MasterConstituency",
+        required: true,
+    },
     electionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Election",

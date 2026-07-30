@@ -1,44 +1,85 @@
 const express = require('express');
 const router = express.Router();
 const Candidate = require('../models/candidate');
+const Admin = require("../models/Admin");
 const { upload } = require("../config/cloudinaryUpload");
 const multer=require("multer");
 
 // Add candidate
-router.post("/candidate/add", upload.fields([
-    { name: 'candidateImage', maxCount: 1 },
-    { name: 'partyImage', maxCount: 1 }
-  ]), async (req, res) => {
+router.post(
+  "/candidate/add",
+  upload.fields([
+    { name: "candidateImage", maxCount: 1 },
+    { name: "partyImage", maxCount: 1 },
+  ]),
+  async (req, res) => {
     try {
-      const { id, name, area, criminalCase,city,state } = req.body;
-  
-      const candidateImage = req.files['candidateImage']?.[0]?.path;
-      const partyImage = req.files['partyImage']?.[0]?.path;
-      console.log("Body:", req.body);
-console.log("Files:", req.files);
+      const { id, name, criminalCase } = req.body;
+
+      const candidateImage = req.files?.candidateImage?.[0]?.path;
+      const partyImage = req.files?.partyImage?.[0]?.path;
+
       if (!candidateImage || !partyImage) {
-        return res.status(400).json({ error: "Both images are required" });
+        return res.status(400).json({
+          message: "Both candidate and party images are required.",
+        });
       }
-  
-      const newCandidate = new Candidate({
+
+      // Get logged-in admin
+      const admin = await Admin.findById(req.user.mongoId);
+
+      if (!admin) {
+        return res.status(404).json({
+          message: "Admin not found.",
+        });
+      }
+
+      if (!admin.electionId || !admin.constituencyId) {
+        return res.status(400).json({
+          message: "Admin is not assigned to an election or constituency.",
+        });
+      }
+
+      // Prevent duplicate candidate ID within the same election
+      const existingCandidate = await Candidate.findOne({
+        id,
+        electionId: admin.electionId,
+      });
+
+      if (existingCandidate) {
+        return res.status(400).json({
+          message: "Candidate ID already exists for this election.",
+        });
+      }
+
+      const candidate = new Candidate({
         id,
         name,
-        area,
+        criminalCase: criminalCase || "",
+
         candidateImage,
         partyImage,
-        city,
-        state,
-        criminalCase: criminalCase || '',
-        voteCount: 0
+
+        electionId: admin.electionId,
+        constituencyId: admin.constituencyId,
+
+        voteCount: 0,
       });
-  
-      await newCandidate.save();
-      res.status(200).json({ message: "Candidate added successfully" });
+
+      await candidate.save();
+
+      res.status(201).json({
+        message: "Candidate added successfully.",
+        candidate,
+      });
     } catch (err) {
-      console.error("Error adding candidate:", err);
-      res.status(500).json({ error: "Internal Server Error" });
+      console.error(err);
+      res.status(500).json({
+        message: "Internal Server Error",
+      });
     }
-});
+  }
+);
 router.get('/candidate/by-area/:area', async (req, res) => {
   try {
     const candidates = await Candidate.find({ area: req.params.area });
@@ -49,12 +90,26 @@ router.get('/candidate/by-area/:area', async (req, res) => {
   }
 });
 // View all candidates
-router.get('/candidate/view', async (req, res) => {
+router.get("/candidate/view", authenticate, loadAdmin, async (req, res) => {
   try {
-    const candidates = await Candidate.find();
+    console.log("===== CANDIDATE VIEW ROUTE HIT =====");
+    const candidates = await Candidate.find({
+      electionId: req.admin.electionId,
+      constituencyId: req.admin.constituencyId,
+    })
+      .populate(
+        "constituencyId",
+        "constituencyName constituencyNumber state district city"
+      )
+      .populate("electionId", "title type");
+      console.log(JSON.stringify(candidates, null, 2));
+
     res.json(candidates);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error(err);
+    res.status(500).json({
+      message: "Unable to load candidates",
+    });
   }
 });
 // Edit candidate
