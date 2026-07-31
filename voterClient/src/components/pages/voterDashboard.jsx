@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { BarChart3, Camera, CheckCircle2, Gavel, Image as ImageIcon, MapPin, ShieldCheck, User, Vote, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import ElectionStatusWidget from "../pages/ElectionStatusWidget";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -233,6 +234,11 @@ if (!selectedElectionData) {
         )}
     </select>
 </label>
+{selectedElectionData && (
+    <ElectionStatusWidget
+        election={selectedElectionData}
+    />
+)}
     {candidatesLoading ? <div className="py-12 text-center text-xs font-bold uppercase tracking-wider text-slate-400">Loading election candidates...</div> : candidates.length === 0 ? <div className="text-center py-12 bg-white border border-slate-200/60 rounded-2xl text-[#64748B] text-xs font-bold uppercase tracking-wider">No candidates are available for the selected election.</div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{candidates.map((candidate) => <article key={candidate._id} className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between gap-6">
     <div className="flex gap-5 items-start">
 

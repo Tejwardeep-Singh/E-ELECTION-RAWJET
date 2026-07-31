@@ -7,13 +7,11 @@ import VoterRegister from './components/pages/voterRegister';
 import Copywright from './components/Copywright';
 import VoterDashboard from './components/pages/voterDashboard';
 import VoterResults from './components/pages/voterResults';
-import Timer from './components/pages/Timer';
 
 export default function App() {
   return (
     <>
       <Nav />
-      <Timer />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/voter/login" element={<VoterLogin />} />
