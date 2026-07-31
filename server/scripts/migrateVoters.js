@@ -33,15 +33,9 @@ async function migrateVoters() {
         status: { $ifNull: ['$status', 'active'] },
         createdAt: { $ifNull: ['$createdAt', '$$NOW'] },
         updatedAt: '$$NOW',
-        votingStatus: {
-          $ifNull: [
-            '$votingStatus',
-            { $cond: [{ $eq: ['$hasVoted', true] }, 'voted', 'not_voted'] },
-          ],
-        },
       },
     },
-    { $unset: ['area', 'city', 'state', 'photo', 'hasVoted'] },
+    { $unset: ['area', 'city', 'state', 'photo'] },
   ]);
 
   console.log(`Migrated ${result.modifiedCount} voter record(s).`);

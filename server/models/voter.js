@@ -150,13 +150,7 @@ address: {
     street: String,
 
     pincode: String,
-},
-
-    status: {
-      type: String,
-      enum: ["active", "inactive", "suspended"],
-      default: "active",
-    }
+}
   },
   {
     timestamps: true,

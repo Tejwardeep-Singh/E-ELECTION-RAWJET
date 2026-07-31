@@ -27,6 +27,7 @@ export default function VoterDashboard() {
   const [modalConfig, setModalConfig] = useState({ isOpen: false, title: '', description: '', candidateId: null, candidateName: '' });
   const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'success', message: '' });
   const [selectedElectionData, setSelectedElectionData] = useState(null);
+  const [alreadyVoted, setAlreadyVoted] = useState(false);
   
   const triggerAlert = (type, message) => setAlertConfig({ isOpen: true, type, message });
 
@@ -46,9 +47,13 @@ export default function VoterDashboard() {
         setCandidates(response.data.candidates || []);
         setSelectedElectionData(response.data.election);
 
+        // NEW
+        setAlreadyVoted(response.data.alreadyVoted);
+
     } catch (error) {
 
         setCandidates([]);
+        setAlreadyVoted(false);
 
         triggerAlert(
             "error",
@@ -142,7 +147,6 @@ useEffect(() => {
   const profileImage = voter?.photo?.original
   ? `${API_URL}/${voter.photo.original}`
   : voter?.photoUrl || "/default-user.png";
-  const hasVoted = voter?.votingStatus === 'voted';
   const now = new Date();
 
 let canVote = false;
@@ -178,7 +182,26 @@ if (!selectedElectionData) {
   return <div className="min-h-screen bg-[#F8FBFF] py-12 px-6 font-sans relative overflow-x-hidden antialiased"><div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.04),transparent_40%)] pointer-events-none" /><div className="absolute inset-0 z-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:6rem_6rem] opacity-20 pointer-events-none" /><div className="relative z-10 max-w-4xl mx-auto space-y-8">
     {voter && <section className="bg-white border border-slate-200/60 rounded-3xl p-6 md:p-8 shadow-sm"><div className="flex flex-col md:flex-row gap-6"><div className="relative shrink-0 self-center md:self-start"><img src={profileImage} alt={`${voter.name}'s profile`} onError={(event) => { event.currentTarget.src = '/default-user.png'; }} className="w-24 h-24 rounded-full object-cover border-4 border-slate-50 shadow-sm" />
     
-    </div><div className="flex-1"><span className="text-[10px] font-mono font-bold text-blue-600 uppercase tracking-widest">Authorized Constituent Profile</span><h1 className="mt-1 text-2xl font-black tracking-tight text-[#0F172A]">{voter.name}</h1>{updatingPhoto && <p className="mt-1 text-[10px] text-blue-600 font-bold animate-pulse">Uploading new profile image asset...</p>}<div className="mt-4 grid gap-3 sm:grid-cols-2">{details.map(([label, value]) => <div key={label} className="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[10px] uppercase font-bold tracking-wide text-slate-400">{label}</p><p className="mt-0.5 text-xs font-semibold text-slate-700 break-words">{value || 'Not available'}</p></div>)}</div></div><div className={`self-start px-4 py-3 rounded-2xl border text-center ${hasVoted ? 'bg-emerald-50/50 border-emerald-100/60 text-emerald-800' : 'bg-amber-50 border-amber-100 text-amber-800'}`}><div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider"><ShieldCheck size={13} />{hasVoted ? 'Ballot Submitted' : 'Ballot Pending'}</div></div></div></section>}
+    </div><div className="flex-1"><span className="text-[10px] font-mono font-bold text-blue-600 uppercase tracking-widest">Authorized Constituent Profile</span><h1 className="mt-1 text-2xl font-black tracking-tight text-[#0F172A]">{voter.name}</h1>{updatingPhoto && <p className="mt-1 text-[10px] text-blue-600 font-bold animate-pulse">Uploading new profile image asset...</p>}<div className="mt-4 grid gap-3 sm:grid-cols-2">{details.map(([label, value]) => <div key={label} className="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2"><p className="text-[10px] uppercase font-bold tracking-wide text-slate-400">{label}</p><p className="mt-0.5 text-xs font-semibold text-slate-700 break-words">{value || 'Not available'}</p></div>)}</div></div>
+    <div
+    className={`self-start px-4 py-3 rounded-2xl border text-center ${
+        alreadyVoted
+            ? "bg-emerald-50/50 border-emerald-100/60 text-emerald-800"
+            : "bg-amber-50 border-amber-100 text-amber-800"
+    }`}
+>
+    <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider">
+        <ShieldCheck size={13} />
+        {alreadyVoted ? "Vote Cast" : "Vote Pending"}
+    </div>
+
+    {selectedElectionData && (
+        <p className="mt-2 text-[10px] font-semibold opacity-80">
+            {selectedElectionData.title}
+        </p>
+    )}
+</div>
+    </div></section>}
 
     <section className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm"><div className="flex items-start gap-3"><MapPin className="mt-0.5 text-blue-600" size={19} /><div><h2 className="font-black text-[#0F172A]">Your constituencies</h2><p className="mt-1 text-xs text-[#64748B]">Constituencies based on different election scales.</p></div></div><div className="mt-4 grid gap-3 md:grid-cols-3">{constituencies.map(([label, constituency]) => <div key={label} className="rounded-2xl border border-slate-200 p-4"><p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">{label}</p><p className="mt-1 text-sm font-bold text-slate-800">{constituency.constituencyName || constituency.name || 'Not available'}</p></div>)}{!constituencies.length && <p className="text-sm text-slate-500">No constituency assignments were returned for this voter.</p>}</div></section>
 
@@ -210,7 +233,7 @@ if (!selectedElectionData) {
     </select>
 </label>
     {candidatesLoading ? <div className="py-12 text-center text-xs font-bold uppercase tracking-wider text-slate-400">Loading election candidates...</div> : candidates.length === 0 ? <div className="text-center py-12 bg-white border border-slate-200/60 rounded-2xl text-[#64748B] text-xs font-bold uppercase tracking-wider">No candidates are available for the selected election.</div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{candidates.map((candidate) => <article key={candidate._id} className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-xs flex flex-col justify-between gap-6"><div className="space-y-4"><div className="flex items-start justify-between gap-4"><div><h3 className="text-lg font-black text-[#0F172A]">{candidate.name}</h3><span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1"><Gavel size={12} />Disclosures: {candidate.criminalCase || 'None'}</span></div>{candidate.partyImage ? <img src={candidate.partyImage} alt="Party emblem" className="w-10 h-10 object-contain bg-slate-50 border border-slate-100 p-1 rounded-xl" /> : <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-300"><ImageIcon size={14} /></div>}</div>{candidate.candidateImage && <img src={candidate.candidateImage} alt={`${candidate.name} portrait`} className="w-full h-32 rounded-2xl object-cover bg-slate-50 border border-slate-100" />}</div>
-    {hasVoted ? (
+    {alreadyVoted ? (
     <div className="w-full text-center py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold uppercase tracking-wider rounded-xl">
         ✅ Vote Already Cast
     </div>

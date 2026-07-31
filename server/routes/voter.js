@@ -1,4 +1,5 @@
 const { JWT_KEY } = require('../config/keys.js');
+const mongoose = require("mongoose");
 const express = require('express');
 const router = express.Router();
 const Voter = require('../models/voter');
@@ -9,6 +10,7 @@ const { voterUpload } = require("../config/cloudinaryUpload");
 const { enrollVoterFace } = require('../services/faceEnrollment');
 const Election = require("../models/election");
 const Constituency = require("../models/constituency");
+const Participation = require("../models/participation");
 
 const uploadVoterImage = (req, res, next) => {
 
@@ -144,12 +146,9 @@ router.post("/vote/:candidateId", authenticateVoter, async (req, res) => {
       });
     }
 
-    // Already voted
-    if (voter.votingStatus === "voted") {
-      return res.status(400).json({
-        message: "You have already voted.",
-      });
-    }
+    
+
+
 
     // Find candidate and populate election
     const candidate = await Candidate.findById(req.params.candidateId)
@@ -168,7 +167,18 @@ router.post("/vote/:candidateId", authenticateVoter, async (req, res) => {
         message: "Election not found.",
       });
     }
+const alreadyVoted =
+await Participation.exists({
+    voterId: voter._id,
+    electionId: election._id
+});
 
+if(alreadyVoted){
+    return res.status(400).json({
+        message:
+        "You have already voted in this election."
+    });
+}
     const now = new Date();
 
     // Election must be Active
@@ -193,17 +203,39 @@ router.post("/vote/:candidateId", authenticateVoter, async (req, res) => {
     }
 
     // Increase vote count
-    candidate.voteCount = (candidate.voteCount || 0) + 1;
-    await candidate.save();
+    const session = await mongoose.startSession();
 
-    // Mark voter as voted
-    voter.votingStatus = "voted";
-    await voter.save();
+try {
+    session.startTransaction();
+
+    // Increase vote count
+    candidate.voteCount = (candidate.voteCount || 0) + 1;
+    await candidate.save({ session });
+
+    // Record participation
+    await Participation.create(
+        [
+            {
+                voterId: voter._id,
+                electionId: election._id,
+            },
+        ],
+        { session }
+    );
+
+    await session.commitTransaction();
+    session.endSession();
 
     return res.status(200).json({
-      message: "Vote recorded successfully.",
-      votingStatus: voter.votingStatus,
+        message: "Vote recorded successfully.",
     });
+
+} catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
+    throw error;
+}
 
   } catch (err) {
     console.error("Vote Error:", err);
@@ -316,6 +348,10 @@ router.get("/candidates/:electionId", authenticateVoter, async (req, res) => {
     }
 
     const election = await Election.findById(req.params.electionId);
+    const alreadyVoted = await Participation.exists({
+  voterId: voter._id,
+  electionId: election._id,
+});
 
     if (!election) {
       return res.status(404).json({
@@ -375,6 +411,7 @@ const candidates = await Candidate.find({
 console.log("Election Constituency:", electionConstituency);
     res.json({
       election,
+      alreadyVoted: !!alreadyVoted,
       candidates,
     });
 
