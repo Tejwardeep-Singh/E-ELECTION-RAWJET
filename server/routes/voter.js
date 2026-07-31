@@ -133,29 +133,86 @@ console.log(voter.photo);
         res.status(500).json({ message: "Server error" });
     }
 });
-  router.post('/vote/:candidateId', authenticateVoter, async (req, res) => {
-    try {
-      const voter = await Voter.findById(req.voterId);
-      if (!voter || voter.votingStatus === 'voted') {
-        return res.status(400).json({ message: 'You have already voted' });
-      }
-  
-      const candidate = await Candidate.findById(req.params.candidateId);
-      if (!candidate) return res.status(404).json({ message: 'Candidate not found' });
-  
-      candidate.voteCount = (candidate.voteCount || 0) + 1;
-      await candidate.save();
-  
-      voter.votingStatus = 'voted';
-      await voter.save();
-  
-      res.json({ message: 'Vote recorded successfully', votingStatus: voter.votingStatus });
-    } catch (err) {
-      console.error('Error during vote:', err);
-      res.status(500).json({ message: 'Server error' });
-    }
-  });
+router.post("/vote/:candidateId", authenticateVoter, async (req, res) => {
+  try {
+    // Find voter
+    const voter = await Voter.findById(req.voterId);
 
+    if (!voter) {
+      return res.status(404).json({
+        message: "Voter not found",
+      });
+    }
+
+    // Already voted
+    if (voter.votingStatus === "voted") {
+      return res.status(400).json({
+        message: "You have already voted.",
+      });
+    }
+
+    // Find candidate and populate election
+    const candidate = await Candidate.findById(req.params.candidateId)
+      .populate("electionId");
+
+    if (!candidate) {
+      return res.status(404).json({
+        message: "Candidate not found.",
+      });
+    }
+
+    const election = candidate.electionId;
+
+    if (!election) {
+      return res.status(404).json({
+        message: "Election not found.",
+      });
+    }
+
+    const now = new Date();
+
+    // Election must be Active
+    if (election.status !== "Active") {
+      return res.status(403).json({
+        message: "Voting is not available because the election is not active.",
+      });
+    }
+
+    // Voting has not started
+    if (election.startDate && now < election.startDate) {
+      return res.status(403).json({
+        message: "Voting has not started yet.",
+      });
+    }
+
+    // Voting has ended
+    if (election.endDate && now > election.endDate) {
+      return res.status(403).json({
+        message: "Voting has already ended.",
+      });
+    }
+
+    // Increase vote count
+    candidate.voteCount = (candidate.voteCount || 0) + 1;
+    await candidate.save();
+
+    // Mark voter as voted
+    voter.votingStatus = "voted";
+    await voter.save();
+
+    return res.status(200).json({
+      message: "Vote recorded successfully.",
+      votingStatus: voter.votingStatus,
+    });
+
+  } catch (err) {
+    console.error("Vote Error:", err);
+
+    return res.status(500).json({
+      message: "Internal server error.",
+    });
+  }
+});
 
 router.get("/results/:electionId", authenticateVoter, async (req, res) => {
   try {

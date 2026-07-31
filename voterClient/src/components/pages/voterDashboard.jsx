@@ -26,6 +26,7 @@ export default function VoterDashboard() {
   const [updatingPhoto, setUpdatingPhoto] = useState(false);
   const [modalConfig, setModalConfig] = useState({ isOpen: false, title: '', description: '', candidateId: null, candidateName: '' });
   const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'success', message: '' });
+  const [selectedElectionData, setSelectedElectionData] = useState(null);
   
   const triggerAlert = (type, message) => setAlertConfig({ isOpen: true, type, message });
 
@@ -43,6 +44,7 @@ export default function VoterDashboard() {
         );
 
         setCandidates(response.data.candidates || []);
+        setSelectedElectionData(response.data.election);
 
     } catch (error) {
 
@@ -141,6 +143,35 @@ useEffect(() => {
   ? `${API_URL}/${voter.photo.original}`
   : voter?.photoUrl || "/default-user.png";
   const hasVoted = voter?.votingStatus === 'voted';
+  const now = new Date();
+
+let canVote = false;
+let voteButtonText = "Cast Vote";
+
+if (!selectedElectionData) {
+  voteButtonText = "Loading Election...";
+} else if (selectedElectionData.status === "Draft") {
+  voteButtonText = "🟡 Election in Draft";
+} else if (selectedElectionData.status === "Archived") {
+  voteButtonText = "⚫ Election Archived";
+} else if (selectedElectionData.status === "Completed") {
+  voteButtonText = "🔴 Voting Closed";
+} else if (
+  selectedElectionData.startDate &&
+  now < new Date(selectedElectionData.startDate)
+) {
+  voteButtonText = `⏳ Voting Starts ${new Date(
+    selectedElectionData.startDate
+  ).toLocaleString()}`;
+} else if (
+  selectedElectionData.endDate &&
+  now > new Date(selectedElectionData.endDate)
+) {
+  voteButtonText = "🔴 Voting Closed";
+} else {
+  canVote = true;
+  voteButtonText = "Cast Vote";
+}
   const constituencies = constituencyDetails(voter);
   const details = [['EPIC Number', voter?.epicNumber], ['Gender', voter?.gender], ['Mobile Number', voter?.mobile], ['Address', fullAddress(voter?.address) || 'Not available']];
 
@@ -178,7 +209,28 @@ useEffect(() => {
         )}
     </select>
 </label>
-    {candidatesLoading ? <div className="py-12 text-center text-xs font-bold uppercase tracking-wider text-slate-400">Loading election candidates...</div> : candidates.length === 0 ? <div className="text-center py-12 bg-white border border-slate-200/60 rounded-2xl text-[#64748B] text-xs font-bold uppercase tracking-wider">No candidates are available for the selected election.</div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{candidates.map((candidate) => <article key={candidate._id} className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-xs flex flex-col justify-between gap-6"><div className="space-y-4"><div className="flex items-start justify-between gap-4"><div><h3 className="text-lg font-black text-[#0F172A]">{candidate.name}</h3><span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1"><Gavel size={12} />Disclosures: {candidate.criminalCase || 'None'}</span></div>{candidate.partyImage ? <img src={candidate.partyImage} alt="Party emblem" className="w-10 h-10 object-contain bg-slate-50 border border-slate-100 p-1 rounded-xl" /> : <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-300"><ImageIcon size={14} /></div>}</div>{candidate.candidateImage && <img src={candidate.candidateImage} alt={`${candidate.name} portrait`} className="w-full h-32 rounded-2xl object-cover bg-slate-50 border border-slate-100" />}</div>{hasVoted ? <div className="w-full text-center py-2 bg-slate-50 border border-slate-200/60 text-slate-400 text-[10px] font-bold uppercase tracking-wider rounded-xl">Voting Locked</div> : <button onClick={() => handleVoteConfirmation(candidate._id, candidate.name)} className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold text-xs rounded-xl py-2.5 shadow-sm uppercase tracking-wider"><Vote size={14} />Cast Vote for {candidate.name}</button>}</article>)}</div>}</section>
+    {candidatesLoading ? <div className="py-12 text-center text-xs font-bold uppercase tracking-wider text-slate-400">Loading election candidates...</div> : candidates.length === 0 ? <div className="text-center py-12 bg-white border border-slate-200/60 rounded-2xl text-[#64748B] text-xs font-bold uppercase tracking-wider">No candidates are available for the selected election.</div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{candidates.map((candidate) => <article key={candidate._id} className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-xs flex flex-col justify-between gap-6"><div className="space-y-4"><div className="flex items-start justify-between gap-4"><div><h3 className="text-lg font-black text-[#0F172A]">{candidate.name}</h3><span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1"><Gavel size={12} />Disclosures: {candidate.criminalCase || 'None'}</span></div>{candidate.partyImage ? <img src={candidate.partyImage} alt="Party emblem" className="w-10 h-10 object-contain bg-slate-50 border border-slate-100 p-1 rounded-xl" /> : <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-300"><ImageIcon size={14} /></div>}</div>{candidate.candidateImage && <img src={candidate.candidateImage} alt={`${candidate.name} portrait`} className="w-full h-32 rounded-2xl object-cover bg-slate-50 border border-slate-100" />}</div>
+    {hasVoted ? (
+    <div className="w-full text-center py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold uppercase tracking-wider rounded-xl">
+        ✅ Vote Already Cast
+    </div>
+) : canVote ? (
+    <button
+        onClick={() => handleVoteConfirmation(candidate._id, candidate.name)}
+        className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold text-xs rounded-xl py-2.5 shadow-sm uppercase tracking-wider"
+    >
+        <Vote size={14} />
+        Cast Vote for {candidate.name}
+    </button>
+) : (
+    <button
+        disabled
+        className="w-full bg-slate-200 text-slate-600 py-2.5 rounded-xl text-xs font-bold uppercase cursor-not-allowed"
+    >
+        {voteButtonText}
+    </button>
+)}
+    </article>)}</div>}</section>
     <button onClick={() => navigate('/voter/results')} className="w-full inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-widest shadow-sm"><BarChart3 size={15} />View Verified Election Results Portal</button>
   </div>
   {modalConfig.isOpen && <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs"><div className="w-full max-w-md bg-white border border-slate-200/80 rounded-3xl p-6 md:p-8 shadow-lg space-y-6 text-center"><div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center mx-auto"><Vote size={22} /></div><div><h3 className="text-lg font-black text-slate-900">{modalConfig.title}</h3><p className="mt-1.5 text-xs font-medium text-slate-500 leading-relaxed">{modalConfig.description}</p></div><div className="flex gap-3"><button onClick={() => setModalConfig((current) => ({ ...current, isOpen: false }))} className="w-1/2 bg-white border border-slate-200 text-slate-700 text-xs font-bold uppercase rounded-xl py-3">Cancel</button><button onClick={executeVote} className="w-1/2 bg-blue-600 text-white text-xs font-bold uppercase rounded-xl py-3">Sign & Transmit Ballot</button></div></div></div>}
