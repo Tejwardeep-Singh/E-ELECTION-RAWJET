@@ -38,7 +38,7 @@ const SAFE_VOTER_FIELDS = [
   'userId',
   'name',
   'address',
-  'photoUrl',
+  'photo',
   'status',
   'lastVerification',
   'createdAt',

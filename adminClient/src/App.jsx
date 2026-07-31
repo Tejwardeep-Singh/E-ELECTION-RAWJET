@@ -124,20 +124,35 @@ const save = async (ev) => {
 `${x.name}
 ${x.epicNumber || x.id}
 ${x.constituencyId?.constituencyName || ""}
-${x.constituencyId?.constituencyNumber || ""}`.toLowerCase().includes(query.toLowerCase()));return <Page title={`Manage ${isVoter?'Voters':'Candidates'}`} subtitle={isVoter?'Manage registered voters in your constituency.':'Manage candidates in your constituency.'} action={<Button onClick={()=>setEditor({})}><Plus size={15}/>Register {isVoter?'voter':'candidate'}</Button>}><div className="relative mb-4 max-w-md"><Search size={16} className="absolute left-3 top-3 text-slate-400"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={`Search ${isVoter?'name or EPIC number':'candidate or constituency'}`} className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm"/></div><Card className="overflow-x-auto p-0"><table className="w-full text-left text-sm"><thead className="border-b bg-slate-50 text-xs uppercase text-slate-500"><tr>{[isVoter?'Photo':'Photo',isVoter?'EPIC Number':'Candidate name',isVoter?'Name':'ID','Constituency',isVoter?'Voting status':'Actions','Actions'].map((x,i)=><th className="px-4 py-3" key={i}>{x}</th>)}</tr></thead><tbody>{filtered.map(x=><tr className="border-b" key={x._id}><td className="px-4 py-3">{x.photoUrl||x.candidateImage?<img className="h-9 w-9 rounded-full object-cover" src={x.photoUrl||x.candidateImage}/>:<span className="grid h-9 w-9 place-items-center rounded-full bg-slate-100"><Users size={14}/></span>}</td><td className="px-4 py-3 font-bold">{isVoter?x.epicNumber:x.name}</td><td className="px-4 py-3">{isVoter?x.name:(x.id||'—')}</td><td className="px-4 py-3">
-  {x.constituencyId ? (
-    <>
-      <div className="font-semibold">
-        {x.constituencyId.constituencyName}
-      </div>
-      <div className="text-xs text-slate-500">
-        Constituency #{x.constituencyId.constituencyNumber}
-      </div>
-    </>
+${x.constituencyId?.constituencyNumber || ""}`.toLowerCase().includes(query.toLowerCase()));return <Page title={`Manage ${isVoter?'Voters':'Candidates'}`} subtitle={isVoter?'Manage registered voters in your constituency.':'Manage candidates in your constituency.'} action={<Button onClick={()=>setEditor({})}><Plus size={15}/>Register {isVoter?'voter':'candidate'}</Button>}><div className="relative mb-4 max-w-md"><Search size={16} className="absolute left-3 top-3 text-slate-400"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={`Search ${isVoter?'name or EPIC number':'candidate or constituency'}`} className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm"/></div><Card className="overflow-x-auto p-0"><table className="w-full text-left text-sm"><thead className="border-b bg-slate-50 text-xs uppercase text-slate-500"><tr>{[isVoter?'Photo':'Photo',isVoter?'EPIC Number':'Candidate name',isVoter?'Name':'ID',isVoter?'Voting status':'Actions','Actions'].map((x,i)=><th className="px-4 py-3" key={i}>{x}</th>)}</tr></thead><tbody>{filtered.map(x=><tr className="border-b" key={x._id}>
+  <td className="px-4 py-3">
+  {isVoter ? (
+    x.photo?.original ? (
+      <img
+        className="h-9 w-9 rounded-full object-cover"
+        src={`http://localhost:3000/${x.photo.original}`}
+        alt={x.name}
+      />
+    ) : (
+      <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-100">
+        <Users size={14} />
+      </span>
+    )
   ) : (
-    "—"
+    x.candidateImage ? (
+      <img
+        className="h-9 w-9 rounded-full object-cover"
+        src={x.candidateImage}
+        alt={x.name}
+      />
+    ) : (
+      <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-100">
+        <Users size={14} />
+      </span>
+    )
   )}
-</td><td className="px-4 py-3">{isVoter?<Status>{x.votingStatus}</Status>:null}</td><td className="px-4 py-3"><button className="mr-3 text-blue-600" onClick={()=>setEditor(x)}><Edit3 size={16}/></button><button className="text-red-600" onClick={()=>setConfirm(x)}><Trash2 size={16}/></button></td></tr>)}{!filtered.length&&<tr><td colSpan="6" className="p-8 text-center text-slate-500">No records found.</td></tr>}</tbody></table></Card>{editor&&<RecordForm isVoter={isVoter} editor={editor} save={save} close={()=>setEditor(null)}/>} {confirm&&<Confirm title={`Delete ${isVoter?'voter':'candidate'}?`} text="This record will be permanently removed." onClose={()=>setConfirm(null)} onConfirm={async()=>{try{await api(`/api/admin/${isVoter?'voter/delete':'candidate/delete'}/${confirm._id}`,{role,method:'DELETE'});notify('Record deleted.');setConfirm(null);load()}catch(e){notify(e.message,'error')}}}/>}</Page> }
+</td><td className="px-4 py-3 font-bold">{isVoter?x.epicNumber:x.name}</td><td className="px-4 py-3">{isVoter?x.name:(x.id||'—')}</td>
+<td className="px-4 py-3">{isVoter?<Status>{x.votingStatus}</Status>:null}</td><td className="px-4 py-3"><button className="mr-3 text-blue-600" onClick={()=>setEditor(x)}><Edit3 size={16}/></button><button className="text-red-600" onClick={()=>setConfirm(x)}><Trash2 size={16}/></button></td></tr>)}{!filtered.length&&<tr><td colSpan="6" className="p-8 text-center text-slate-500">No records found.</td></tr>}</tbody></table></Card>{editor&&<RecordForm isVoter={isVoter} editor={editor} save={save} close={()=>setEditor(null)}/>} {confirm&&<Confirm title={`Delete ${isVoter?'voter':'candidate'}?`} text="This record will be permanently removed." onClose={()=>setConfirm(null)} onConfirm={async()=>{try{await api(`/api/admin/${isVoter?'voter/delete':'candidate/delete'}/${confirm._id}`,{role,method:'DELETE'});notify('Record deleted.');setConfirm(null);load()}catch(e){notify(e.message,'error')}}}/>}</Page> }
 
 
 function RecordForm({isVoter,editor,save,close}){return <Modal title={`${editor._id?'Edit':'Register'} ${isVoter?'Voter':'Candidate'}`} onClose={close}><form onSubmit={save} className="space-y-4"><div className="grid grid-cols-2 gap-3"><Field label="Name" name="name" required defaultValue={editor.name}/><Field label={isVoter?'EPIC number':'Candidate ID'} name={isVoter?'epicNumber':'id'} required={!editor._id} defaultValue={isVoter?editor.epicNumber:editor.id}/></div>{isVoter&&!editor._id&&<><Field label="Voter user ID" name="userId" required/><Field label="Password" name="password" type="password" required/></>}{isVoter?<Select label="Account status" name="status" defaultValue={editor.status||'active'}><option>active</option><option>inactive</option><option>suspended</option></Select>:<><Field label="Criminal case / declaration" name="criminalCase" defaultValue={editor.criminalCase}/>{!editor._id&&<><Field label="Candidate photo" name="candidateImage" type="file" accept="image/*" required/><Field label="Party emblem" name="partyImage" type="file" accept="image/*" required/></>}</>} {isVoter&&!editor._id&&<Field label="Profile photo (optional)" name="photoUrl" type="file" accept="image/*"/>}<div className="flex justify-end gap-2"><Button type="button" className="bg-slate-100 text-slate-700" onClick={close}>Cancel</Button><Button type="submit">Save</Button></div></form></Modal>}
