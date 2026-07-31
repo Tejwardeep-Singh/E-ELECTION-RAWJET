@@ -40,7 +40,7 @@ function Elections({ notify }) { const [items, setItems] = useState([]), [query,
 
 function Admins({ notify }) { const [admins, setAdmins] = useState([]),
    [query, setQuery] = useState(''), [editor, setEditor] = useState(null), 
-   [confirm, setConfirm] = useState(null); const { selectedElection } = useElection();
+   [confirm, setConfirm] = useState(null); const { selectedElection } = useElection();   
    const load = useCallback(() => { if (!selectedElection) { setAdmins([]); return Promise.resolve(); } return api(`/api/head/view?electionId=${selectedElection._id}`,{role:'head'}).then(setAdmins).catch(e=>notify(e.message,'error')); },[selectedElection,notify]); useEffect(()=>{load()},[load]);
    const save = async ev => { ev.preventDefault(); const f=Object.fromEntries(new FormData(ev.currentTarget)); try { await api(editor?._id?`/api/head/edit/${editor._id}`:'/api/head/add',{role:'head',method:editor?._id?'PUT':'POST',body:f}); notify('Administrator saved successfully.');setEditor(null);load(); }catch(e){notify(e.message,'error')} }; const filtered = admins.filter(a =>
   `${a.name}
@@ -74,7 +74,7 @@ function Admins({ notify }) { const [admins, setAdmins] = useState([]),
 function AdminOverview({notify}) { const [data,setData]=useState({}); const navigate=useNavigate(); useEffect(()=>{Promise.all([api('/api/admin/me',{role:'admin'}),api('/api/admin/voter/view',{role:'admin'}),api('/api/admin/candidate/view',{role:'admin'})]).then(([me,voters,candidates])=>setData({me,voters,candidates})).catch(e=>notify(e.message,'error'))},[notify]); const cards=[['Assigned Election',data.me?.election?.title||'Assigned election',CalendarDays],['Assigned Constituency',data.me?.constituency?.name || "—"|'—',FileText],['Registered Voters',data.voters?.length||0,UserPlus],['Registered Candidates',data.candidates?.length||0,Users],['Election Status',data.me?.election?.status||'—',CheckCircle2]];return <Page title="Admin Overview" subtitle="Your assigned election and constituency."><div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{cards.map(([l,v,I])=><Card key={l}><I className="mb-4 text-blue-600" size={18}/><p className="text-xs font-bold uppercase text-slate-400">{l}</p><p className="mt-1 text-xl font-black">{v}</p></Card>)}</div><div className="mt-5 flex gap-3"><Button onClick={()=>navigate('/admin/voters')}>Register Voter</Button><Button className="border border-slate-200 bg-white text-slate-700" onClick={()=>navigate('/admin/candidate/view')}>Register Candidate</Button></div></Page> }
 
 
-function Directory({kind,notify}) { const role='admin', isVoter=kind==='voter'; const [items,setItems]=useState([]),[query,setQuery]=useState(''),[editor,setEditor]=useState(null),[confirm,setConfirm]=useState(null); const load=useCallback(()=>api(`/api/admin/${isVoter?'voter':'candidate'}/view`,{role}).then(setItems).catch(e=>notify(e.message,'error')),[isVoter,notify]);useEffect(()=>{load()},[load]);
+function Directory({kind,notify}) { const role='admin', isVoter=kind==='voter'; const [items,setItems]=useState([]),[query,setQuery]=useState(''),[editor,setEditor]=useState(null),[confirm,setConfirm]=useState(null),[declaration,setDeclaration]=useState(null);; const load=useCallback(()=>api(`/api/admin/${isVoter?'voter':'candidate'}/view`,{role}).then(setItems).catch(e=>notify(e.message,'error')),[isVoter,notify]);useEffect(()=>{load()},[load]);
 const save = async (ev) => {
   ev.preventDefault();
 
@@ -124,35 +124,126 @@ const save = async (ev) => {
 `${x.name}
 ${x.epicNumber || x.id}
 ${x.constituencyId?.constituencyName || ""}
-${x.constituencyId?.constituencyNumber || ""}`.toLowerCase().includes(query.toLowerCase()));return <Page title={`Manage ${isVoter?'Voters':'Candidates'}`} subtitle={isVoter?'Manage registered voters in your constituency.':'Manage candidates in your constituency.'} action={<Button onClick={()=>setEditor({})}><Plus size={15}/>Register {isVoter?'voter':'candidate'}</Button>}><div className="relative mb-4 max-w-md"><Search size={16} className="absolute left-3 top-3 text-slate-400"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={`Search ${isVoter?'name or EPIC number':'candidate or constituency'}`} className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm"/></div><Card className="overflow-x-auto p-0"><table className="w-full text-left text-sm"><thead className="border-b bg-slate-50 text-xs uppercase text-slate-500"><tr>{[isVoter?'Photo':'Photo',isVoter?'EPIC Number':'Candidate name',isVoter?'Name':'ID',isVoter?'Voting status':'Actions','Actions'].map((x,i)=><th className="px-4 py-3" key={i}>{x}</th>)}</tr></thead><tbody>{filtered.map(x=><tr className="border-b" key={x._id}>
-  <td className="px-4 py-3">
+${x.constituencyId?.constituencyNumber || ""}`.toLowerCase().includes(query.toLowerCase()));return <Page title={`Manage ${isVoter?'Voters':'Candidates'}`} subtitle={isVoter?'Manage registered voters in your constituency.':'Manage candidates in your constituency.'} action={<Button onClick={()=>setEditor({})}><Plus size={15}/>Register {isVoter?'voter':'candidate'}</Button>}><div className="relative mb-4 max-w-md"><Search size={16} className="absolute left-3 top-3 text-slate-400"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={`Search ${isVoter?'name or EPIC number':'candidate or constituency'}`} className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm"/></div><Card className="overflow-x-auto p-0"><table className="w-full text-left text-sm">
+  <thead className="border-b bg-slate-50 text-xs uppercase text-slate-500">
   {isVoter ? (
-    x.photo?.original ? (
-      <img
-        className="h-9 w-9 rounded-full object-cover"
-        src={`http://localhost:3000/${x.photo.original}`}
-        alt={x.name}
-      />
-    ) : (
-      <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-100">
-        <Users size={14} />
-      </span>
-    )
+    <tr>
+      <th className="px-4 py-3">Photo</th>
+      <th className="px-4 py-3">EPIC Number</th>
+      <th className="px-4 py-3">Name</th>
+      <th className="px-4 py-3">Voting Status</th>
+      <th className="px-4 py-3">Actions</th>
+    </tr>
   ) : (
-    x.candidateImage ? (
-      <img
-        className="h-9 w-9 rounded-full object-cover"
-        src={x.candidateImage}
-        alt={x.name}
-      />
-    ) : (
-      <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-100">
-        <Users size={14} />
-      </span>
-    )
+    <tr>
+      <th className="px-4 py-3">Photo</th>
+      <th className="px-4 py-3">Candidate Name</th>
+      <th className="px-4 py-3">ID</th>
+      <th className="px-4 py-3">Criminal Declaration</th>
+      <th className="px-4 py-3">Actions</th>
+    </tr>
   )}
-</td><td className="px-4 py-3 font-bold">{isVoter?x.epicNumber:x.name}</td><td className="px-4 py-3">{isVoter?x.name:(x.id||'—')}</td>
-<td className="px-4 py-3">{isVoter?<Status>{x.votingStatus}</Status>:null}</td><td className="px-4 py-3"><button className="mr-3 text-blue-600" onClick={()=>setEditor(x)}><Edit3 size={16}/></button><button className="text-red-600" onClick={()=>setConfirm(x)}><Trash2 size={16}/></button></td></tr>)}{!filtered.length&&<tr><td colSpan="6" className="p-8 text-center text-slate-500">No records found.</td></tr>}</tbody></table></Card>{editor&&<RecordForm isVoter={isVoter} editor={editor} save={save} close={()=>setEditor(null)}/>} {confirm&&<Confirm title={`Delete ${isVoter?'voter':'candidate'}?`} text="This record will be permanently removed." onClose={()=>setConfirm(null)} onConfirm={async()=>{try{await api(`/api/admin/${isVoter?'voter/delete':'candidate/delete'}/${confirm._id}`,{role,method:'DELETE'});notify('Record deleted.');setConfirm(null);load()}catch(e){notify(e.message,'error')}}}/>}</Page> }
+</thead>
+  <tbody>
+  {filtered.map((x) => (
+    <tr className="border-b" key={x._id}>
+      {/* Photo */}
+      <td className="px-4 py-3">
+        {isVoter ? (
+          x.photo?.original ? (
+            <img
+              className="h-9 w-9 rounded-full object-cover"
+              src={`http://localhost:3000/${x.photo.original}`}
+              alt={x.name}
+            />
+          ) : (
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-100">
+              <Users size={14} />
+            </span>
+          )
+        ) : x.candidateImage ? (
+          <img
+            className="h-9 w-9 rounded-full object-cover"
+            src={x.candidateImage}
+            alt={x.name}
+          />
+        ) : (
+          <span className="grid h-9 w-9 place-items-center rounded-full bg-slate-100">
+            <Users size={14} />
+          </span>
+        )}
+      </td>
+
+      {/* EPIC Number / Candidate Name */}
+      <td className="px-4 py-3 font-bold">
+        {isVoter ? x.epicNumber : x.name}
+      </td>
+
+      {/* Name / Candidate ID */}
+      <td className="px-4 py-3">
+        {isVoter ? x.name : (x.id || "—")}
+      </td>
+
+      {/* Voting Status / Crimminal Cases */}
+      <td className="px-4 py-3">
+        {isVoter ? (
+          <Status>{x.votingStatus}</Status>
+        ) :<button
+  className="inline-flex items-center gap-1 rounded-lg  bg-white px-3 py-1.5 text-xs font-semibold text-slate-700  transition hover:border-blue-300 hover:text-blue-700"
+  onClick={() => setDeclaration(x)}
+>
+  <FileText size={14} />
+  View
+</button>}
+      </td>
+
+      {/* Actions */}
+      <td className="px-4 py-3">
+        <button
+          className="mr-3 text-blue-600"
+          onClick={() => setEditor(x)}
+        >
+          <Edit3 size={16} />
+        </button>
+
+        <button
+          className="text-red-600"
+          onClick={() => setConfirm(x)}
+        >
+          <Trash2 size={16} />
+        </button>
+      </td>
+    </tr>
+  ))}
+
+  {!filtered.length && (
+    <tr>
+      <td colSpan="5" className="p-8 text-center text-slate-500">
+        No records found.
+      </td>
+    </tr>
+  )}
+</tbody>
+</table></Card>{editor&&<RecordForm isVoter={isVoter} editor={editor} save={save} close={()=>setEditor(null)}/>} {confirm&&<Confirm title={`Delete ${isVoter?'voter':'candidate'}?`} text="This record will be permanently removed." onClose={()=>setConfirm(null)} onConfirm={async()=>{try{await api(`/api/admin/${isVoter?'voter/delete':'candidate/delete'}/${confirm._id}`,{role,method:'DELETE'});notify('Record deleted.');setConfirm(null);load()}catch(e){notify(e.message,'error')}}}/>}
+  {declaration && (
+  <Modal
+    title={`Criminal Declaration - ${declaration.name}`}
+    onClose={() => setDeclaration(null)}
+  >
+    <div className="space-y-4">
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 whitespace-pre-wrap text-sm">
+        {declaration.criminalCase || "No criminal declaration submitted."}
+      </div>
+
+      <div className="flex justify-end">
+        <Button onClick={() => setDeclaration(null)}>
+          Close
+        </Button>
+      </div>
+    </div>
+  </Modal>
+)}
+</Page> }
 
 
 function RecordForm({isVoter,editor,save,close}){return <Modal title={`${editor._id?'Edit':'Register'} ${isVoter?'Voter':'Candidate'}`} onClose={close}><form onSubmit={save} className="space-y-4"><div className="grid grid-cols-2 gap-3"><Field label="Name" name="name" required defaultValue={editor.name}/><Field label={isVoter?'EPIC number':'Candidate ID'} name={isVoter?'epicNumber':'id'} required={!editor._id} defaultValue={isVoter?editor.epicNumber:editor.id}/></div>{isVoter&&!editor._id&&<><Field label="Voter user ID" name="userId" required/><Field label="Password" name="password" type="password" required/></>}{isVoter?<Select label="Account status" name="status" defaultValue={editor.status||'active'}><option>active</option><option>inactive</option><option>suspended</option></Select>:<><Field label="Criminal case / declaration" name="criminalCase" defaultValue={editor.criminalCase}/>{!editor._id&&<><Field label="Candidate photo" name="candidateImage" type="file" accept="image/*" required/><Field label="Party emblem" name="partyImage" type="file" accept="image/*" required/></>}</>} {isVoter&&!editor._id&&<Field label="Profile photo (optional)" name="photoUrl" type="file" accept="image/*"/>}<div className="flex justify-end gap-2"><Button type="button" className="bg-slate-100 text-slate-700" onClick={close}>Cancel</Button><Button type="submit">Save</Button></div></form></Modal>}
@@ -160,4 +251,5 @@ function Results(){const [candidates,setCandidates]=useState([]),[message,setMes
 function SettingsPage(){return <Page title="System Settings" subtitle="Maintain core election-system settings."><div className="max-w-3xl space-y-4"><Card><h2 className="font-bold">Results publication</h2><p className="mt-1 text-sm text-slate-500">Publish results only after the election has been completed and verified.</p></Card><Card><h2 className="font-bold">Security controls</h2><p className="mt-1 text-sm text-slate-500">Administrator permissions are assigned through election and constituency assignments.</p></Card></div></Page>}
 function Profile({notify}){const [me,setMe]=useState(null);useEffect(()=>{api('/api/admin/me',{role:'admin'}).then(setMe).catch(e=>notify(e.message,'error'))},[notify]);return <Page title="Profile" subtitle="Your assigned election and constituency."><Card className="max-w-2xl"><div className="grid gap-4 sm:grid-cols-2"><p><b>Name</b><br/>{me?.name||'—'}</p><p><b>Email / User ID</b><br/>{me?.userId||'—'}</p><p><b>Assigned election</b><br/>{me?.election?.title||'—'}</p><p><b>Assigned constituency</b><br/>{me?.constituency?.name||me?.address?.area||'—'}</p></div><p className="mt-6 border-t pt-5 text-sm text-slate-500">Password and profile-image updates are ready for the administrator profile API.</p></Card></Page>}
 function Confirm({title,text,onClose,onConfirm}){return <Modal title={title} onClose={onClose}><p className="text-sm text-slate-600">{text}</p><div className="mt-6 flex justify-end gap-2"><Button className="bg-slate-100 text-slate-700" onClick={onClose}>Cancel</Button><Button className="bg-red-600 hover:bg-red-700" onClick={onConfirm}>Confirm</Button></div></Modal>}; const formatDate=v=>v?new Date(v).toLocaleDateString():'—'; const toInputDate=v=>v?new Date(v).toISOString().slice(0,16):'';
+
 export default function App(){const [toast,notify,clear]=useNotify();const shell=(role,el)=><Guard role={role}><PortalShell role={role}>{el}</PortalShell></Guard>;return <ElectionProvider><Routes><Route path="/" element={<><Nav/><Home/></>}/><Route path="/head" element={<><Nav/><HeadLogin/></>}/><Route path="/admin" element={<><Nav/><AdminLogin/></>}/><Route path="/head/dashboard" element={shell('head',<HeadOverview notify={notify}/>)}/><Route path="/head/election" element={shell('head',<Elections notify={notify}/>)}/><Route path="/head/viewAdmins" element={shell('head',<Admins notify={notify}/>)}/><Route path="/head/results" element={shell('head',<Results notify={notify}/>)}/><Route path="/head/settings" element={shell('head',<SettingsPage/>)}/><Route path="/admin/dashboard" element={shell('admin',<AdminOverview notify={notify}/>)}/><Route path="/admin/voters" element={shell('admin',<Directory kind="voter" notify={notify}/>)}/><Route path="/admin/candidate/view" element={shell('admin',<Directory kind="candidate" notify={notify}/>)}/><Route path="/admin/profile" element={shell('admin',<Profile notify={notify}/>)}/><Route path="*" element={<Navigate to="/" replace/>}/></Routes><Toast toast={toast} clear={clear}/></ElectionProvider>}

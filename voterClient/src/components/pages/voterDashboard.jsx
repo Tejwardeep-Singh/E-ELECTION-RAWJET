@@ -28,6 +28,7 @@ export default function VoterDashboard() {
   const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'success', message: '' });
   const [selectedElectionData, setSelectedElectionData] = useState(null);
   const [alreadyVoted, setAlreadyVoted] = useState(false);
+  const [declaration, setDeclaration] = useState(null);
   
   const triggerAlert = (type, message) => setAlertConfig({ isOpen: true, type, message });
 
@@ -232,7 +233,64 @@ if (!selectedElectionData) {
         )}
     </select>
 </label>
-    {candidatesLoading ? <div className="py-12 text-center text-xs font-bold uppercase tracking-wider text-slate-400">Loading election candidates...</div> : candidates.length === 0 ? <div className="text-center py-12 bg-white border border-slate-200/60 rounded-2xl text-[#64748B] text-xs font-bold uppercase tracking-wider">No candidates are available for the selected election.</div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{candidates.map((candidate) => <article key={candidate._id} className="bg-white border border-slate-200/60 rounded-3xl p-6 shadow-xs flex flex-col justify-between gap-6"><div className="space-y-4"><div className="flex items-start justify-between gap-4"><div><h3 className="text-lg font-black text-[#0F172A]">{candidate.name}</h3><span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wide mt-1"><Gavel size={12} />Disclosures: {candidate.criminalCase || 'None'}</span></div>{candidate.partyImage ? <img src={candidate.partyImage} alt="Party emblem" className="w-10 h-10 object-contain bg-slate-50 border border-slate-100 p-1 rounded-xl" /> : <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center text-slate-300"><ImageIcon size={14} /></div>}</div>{candidate.candidateImage && <img src={candidate.candidateImage} alt={`${candidate.name} portrait`} className="w-full h-32 rounded-2xl object-cover bg-slate-50 border border-slate-100" />}</div>
+    {candidatesLoading ? <div className="py-12 text-center text-xs font-bold uppercase tracking-wider text-slate-400">Loading election candidates...</div> : candidates.length === 0 ? <div className="text-center py-12 bg-white border border-slate-200/60 rounded-2xl text-[#64748B] text-xs font-bold uppercase tracking-wider">No candidates are available for the selected election.</div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{candidates.map((candidate) => <article key={candidate._id} className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between gap-6">
+    <div className="flex gap-5 items-start">
+
+  {/* Candidate Photo */}
+  <div className="shrink-0">
+    {candidate.candidateImage ? (
+      <img
+        src={candidate.candidateImage}
+        alt={candidate.name}
+        className="w-28 h-28 rounded-2xl object-cover border-2 border-slate-200 shadow-sm"
+      />
+    ) : (
+      <div className="w-28 h-28 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
+        <ImageIcon size={24} />
+      </div>
+    )}
+  </div>
+
+  {/* Candidate Info */}
+  <div className="flex-1">
+
+    <div className="flex justify-between items-start">
+
+      <div>
+        <h3 className="text-xl font-black text-slate-900">
+          {candidate.name}
+        </h3>
+
+        <p className="mt-1 text-sm text-slate-500">
+          Candidate ID: {candidate.id || "N/A"}
+        </p>
+
+        <button
+  className="mt-3 inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+  onClick={() => setDeclaration(candidate)}
+>
+  <Gavel size={14} />
+  View Criminal Declaration
+</button>
+      </div>
+
+      {candidate.partyImage ? (
+        <img
+          src={candidate.partyImage}
+          alt="Party emblem"
+          className="w-12 h-12 rounded-xl border border-slate-200 bg-white p-1 object-contain"
+        />
+      ) : (
+        <div className="w-12 h-12 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center text-slate-300">
+          <ImageIcon size={16} />
+        </div>
+      )}
+
+    </div>
+
+  </div>
+
+</div>
     {alreadyVoted ? (
     <div className="w-full text-center py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-bold uppercase tracking-wider rounded-xl">
         ✅ Vote Already Cast
@@ -253,7 +311,44 @@ if (!selectedElectionData) {
         {voteButtonText}
     </button>
 )}
-    </article>)}</div>}</section>
+    </article>)}
+    {declaration && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4">
+    <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
+
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-black text-slate-900">
+          Criminal Declaration
+        </h2>
+
+        <button
+          onClick={() => setDeclaration(null)}
+          className="text-2xl text-slate-400 hover:text-slate-700"
+        >
+          ×
+        </button>
+      </div>
+
+      <p className="mt-2 text-sm font-semibold text-slate-500">
+        {declaration.name}
+      </p>
+
+      <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 whitespace-pre-wrap text-sm text-slate-700">
+        {declaration.criminalCase || "No criminal declaration submitted."}
+      </div>
+
+      <div className="mt-6 flex justify-end">
+        <button
+          onClick={() => setDeclaration(null)}
+          className="rounded-xl bg-blue-600 px-5 py-2 font-semibold text-white hover:bg-blue-700"
+        >
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+)}</div>}</section>
     <button onClick={() => navigate('/voter/results')} className="w-full inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-widest shadow-sm"><BarChart3 size={15} />View Verified Election Results Portal</button>
   </div>
   {modalConfig.isOpen && <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs"><div className="w-full max-w-md bg-white border border-slate-200/80 rounded-3xl p-6 md:p-8 shadow-lg space-y-6 text-center"><div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center mx-auto"><Vote size={22} /></div><div><h3 className="text-lg font-black text-slate-900">{modalConfig.title}</h3><p className="mt-1.5 text-xs font-medium text-slate-500 leading-relaxed">{modalConfig.description}</p></div><div className="flex gap-3"><button onClick={() => setModalConfig((current) => ({ ...current, isOpen: false }))} className="w-1/2 bg-white border border-slate-200 text-slate-700 text-xs font-bold uppercase rounded-xl py-3">Cancel</button><button onClick={executeVote} className="w-1/2 bg-blue-600 text-white text-xs font-bold uppercase rounded-xl py-3">Sign & Transmit Ballot</button></div></div></div>}
