@@ -90,11 +90,6 @@ const voterSchema = new mongoose.Schema(
 
     enrolledAt: Date,
   },
-      votingStatus: {
-        type: String,
-        enum: ["not_voted", "verified", "voted"],
-        default: "not_voted",
-      },
 
       lastVerification: {
     success: {

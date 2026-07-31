@@ -63,8 +63,6 @@ function createVoter({
 
         },
 
-        votingStatus: "not_voted",
-
         lastVerification: {
 
             success: false,

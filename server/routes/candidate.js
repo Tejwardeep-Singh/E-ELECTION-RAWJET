@@ -39,26 +39,67 @@ const SAFE_VOTER_FIELDS = [
   'name',
   'address',
   'photoUrl',
-  'votingStatus',
   'status',
   'lastVerification',
   'createdAt',
   'updatedAt',
 ].join(' ');
 
-const scopeFor = (req) => req.user.role === 'admin'
-  ? {
-      electionId: req.admin.electionId,
-      constituencyId: req.admin.constituencyId,
-    }
-  : {};
 
+
+async function getElectionContext(req) {
+    if (req.user.role !== "admin") {
+        return null;
+    }
+
+    const [election, constituency] = await Promise.all([
+        Election.findById(req.admin.electionId),
+        Constituency.findById(req.admin.constituencyId),
+    ]);
+
+    if (!election || !constituency) {
+        throw new Error("Invalid admin jurisdiction.");
+    }
+
+    return { election, constituency };
+}
+
+function getVoterFilter(context) {
+    const masterId = context.constituency.masterConstituencyId;
+
+    switch (context.election.type) {
+        case "Lok Sabha":
+            return {
+                "constituencies.lokSabha": masterId,
+            };
+
+        case "Assembly":
+            return {
+                "constituencies.assembly": masterId,
+            };
+
+        case "Municipal":
+            return {
+                "constituencies.municipal": masterId,
+            };
+
+        default:
+            throw new Error(`Unsupported election type: ${context.election.type}`);
+    }
+}
+
+function getCandidateFilter(context) {
+    return {
+        electionId: context.election._id,
+        constituencyId: context.constituency._id,
+    };
+}
 const parseAddress = (value) => typeof value === 'string' ? JSON.parse(value) : value;
 
 // Voters do not hold admin credentials. This read-only lookup preserves voting flow.
 router.get('/candidate/by-area/:area', async (req, res) => {
   try {
-    const filter = { 'address.area': req.params.area };
+    const filter =  { 'address.area': req.params.area };
     if (req.query.city) filter['address.city'] = req.query.city;
     if (req.query.state) filter['address.state'] = req.query.state;
     res.json(await Candidate.find(filter));
@@ -171,12 +212,19 @@ router.get(
     try {
       if (req.user.role === "admin") {
         await loadAdmin(req, res, async () => {
-          const candidates = await Candidate.find(scopeFor(req))
-            .populate(
-              "constituencyId",
-              "constituencyName constituencyNumber state district city"
-            )
-            .populate("electionId", "title type");
+          const context = await getElectionContext(req);
+
+const candidates = await Candidate.find(
+    getCandidateFilter(context)
+)
+.populate(
+    "constituencyId",
+    "constituencyName constituencyNumber state district city"
+)
+.populate(
+    "electionId",
+    "title type"
+);
 
           res.json(candidates);
         });
@@ -204,7 +252,18 @@ router.put('/candidate/edit/:id', upload.single('candidateImage'), async (req, r
     if (req.body.partyImageUrl) update.partyImage = req.body.partyImageUrl;
     if (req.user.role === 'head' && req.body.address) update.address = parseAddress(req.body.address);
 
-    const candidate = await Candidate.findOneAndUpdate({ _id: req.params.id, ...scopeFor(req) }, update, { new: true, runValidators: true });
+    const context = await getElectionContext(req);
+
+const candidate = await Candidate.findOneAndUpdate(
+{
+    _id: req.params.id,
+    ...getCandidateFilter(context),
+},
+update,
+{
+    new: true,
+    runValidators: true,
+});
     if (!candidate) return res.status(404).json({ message: 'Candidate not found in your jurisdiction' });
     res.json({ message: 'Candidate updated successfully', candidate });
   } catch (error) {
@@ -214,7 +273,12 @@ router.put('/candidate/edit/:id', upload.single('candidateImage'), async (req, r
 
 router.delete('/candidate/delete/:id', async (req, res) => {
   try {
-    const candidate = await Candidate.findOneAndDelete({ _id: req.params.id, ...scopeFor(req) });
+    const context = await getElectionContext(req);
+
+const candidate = await Candidate.findOneAndDelete({
+    _id: req.params.id,
+    ...getCandidateFilter(context),
+});
     if (!candidate) return res.status(404).json({ message: 'Candidate not found in your jurisdiction' });
     res.json({ message: 'Candidate deleted successfully' });
   } catch (error) {
@@ -222,14 +286,70 @@ router.delete('/candidate/delete/:id', async (req, res) => {
   }
 });
 
-router.get('/voter/view', async (req, res) => {
-  try {
-    res.json(await Voter.find(scopeFor(req)).select(SAFE_VOTER_FIELDS));
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+// router.get('/voter/view', async (req, res) => {
+//   try {
+//     res.json(await Voter.find(scopeFor(req)).select(SAFE_VOTER_FIELDS));
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+router.get("/voter/view", authenticate, loadAdmin, async (req, res) => {
+    try {
+        // Get admin's election and constituency
+        const [election, constituency] = await Promise.all([
+            Election.findById(req.admin.electionId).select("type"),
+            Constituency.findById(req.admin.constituencyId).select("masterConstituencyId"),
+        ]);
 
+        if (!election) {
+            return res.status(404).json({ message: "Election not found." });
+        }
+
+        if (!constituency) {
+            return res.status(404).json({ message: "Constituency not found." });
+        }
+
+        let filter =  await {};
+
+        switch (election.type) {
+            case "Lok Sabha":
+                filter = {
+                    "constituencies.lokSabha": constituency.masterConstituencyId,
+                };
+                break;
+
+            case "Assembly":
+                filter = {
+                    "constituencies.assembly": constituency.masterConstituencyId,
+                };
+                break;
+
+            case "Municipal":
+                filter = {
+                    "constituencies.municipal": constituency.masterConstituencyId,
+                };
+                break;
+
+            default:
+                return res.status(400).json({
+                    message: `Unsupported election type: ${election.type}`,
+                });
+        }
+
+        const voters = await Voter.find(filter)
+            .select(SAFE_VOTER_FIELDS)
+            .sort({ name: 1 });
+
+        res.json(voters);
+
+    } catch (error) {
+        console.error("View Voters Error:", error);
+        res.status(500).json({
+            message: "Failed to fetch voters.",
+            error: error.message,
+        });
+    }
+});
 // A voter is loaded before the jurisdiction comparison so an administrator
 // receives an explicit forbidden response when attempting to access a voter
 // outside of their assigned state, city, and area.
@@ -263,7 +383,18 @@ router.put('/voter/edit/:id', authenticate, allowHeadOrAdmin, async (req, res) =
   try {
     const update = { name: req.body.name, status: req.body.status };
     if (req.user.role === 'head' && req.body.address) update.address = parseAddress(req.body.address);
-    const voter = await Voter.findOneAndUpdate({ _id: req.params.id, ...scopeFor(req) }, update, { new: true, runValidators: true });
+    const context = await getElectionContext(req);
+
+const voter = await Voter.findOneAndUpdate(
+{
+    _id: req.params.id,
+    ...getVoterFilter(context),
+},
+update,
+{
+    new: true,
+    runValidators: true,
+});
     if (!voter) return res.status(404).json({ message: 'Voter not found in your jurisdiction' });
     res.json({ message: 'Voter updated successfully', voter: await Voter.findById(voter._id).select(SAFE_VOTER_FIELDS) });
   } catch (error) {
@@ -273,7 +404,12 @@ router.put('/voter/edit/:id', authenticate, allowHeadOrAdmin, async (req, res) =
 
 router.delete('/voter/delete/:id', async (req, res) => {
   try {
-    const voter = await Voter.findOneAndDelete({ _id: req.params.id, ...scopeFor(req) });
+    const context = await getElectionContext(req);
+
+const voter = await Voter.findOneAndDelete({
+    _id: req.params.id,
+    ...getVoterFilter(context),
+});
     if (!voter) return res.status(404).json({ message: 'Voter not found in your jurisdiction' });
     res.json({ message: 'Voter deleted successfully' });
   } catch (error) {
