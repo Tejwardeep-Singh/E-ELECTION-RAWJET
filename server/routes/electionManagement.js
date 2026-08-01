@@ -117,19 +117,129 @@ router.get('/', async (req, res) => {
   res.json(elections);
 });
 
-router.get('/:electionId/dashboard', async (req, res) => {
-  try {
-    const election = await Election.findById(req.params.electionId);
-    await syncElectionStatus(election);
-    if (!election) return res.status(404).json({ message: 'Election not found' });
-    const [constituencies, admins, candidates, voters] = await Promise.all([
-      Constituency.countDocuments({ electionId: election._id }), Admin.countDocuments({ electionId: election._id }),
-      Candidate.countDocuments({ electionId: election._id }), Voter.countDocuments({ electionId: election._id }),
-    ]);
-    res.json({ election, statistics: { constituencies, admins, candidates, voters } });
-  } catch (error) { res.status(400).json({ message: 'Invalid election id' }); }
-});
+// router.get('/:electionId/dashboard', async (req, res) => {
+//   try {
+//     const election = await Election.findById(req.params.electionId);
+//     await syncElectionStatus(election);
+//     if (!election) return res.status(404).json({ message: 'Election not found' });
+//     const [constituencies, admins, candidates, voters] = await Promise.all([
+//       Constituency.countDocuments({ electionId: election._id }), Admin.countDocuments({ electionId: election._id }),
+//       Candidate.countDocuments({ electionId: election._id }), Voter.countDocuments({ electionId: election._id }),
+//     ]);
+//     res.json({ election, statistics: { constituencies, admins, candidates, voters } });
+//   } catch (error) { res.status(400).json({ message: 'Invalid election id' }); }
+// });
 
+router.get("/:electionId/dashboard", async (req, res) => {
+  try {
+    const { electionId } = req.params;
+
+    const election = await Election.findById(electionId);
+
+    if (!election) {
+      return res.status(404).json({
+        message: "Election not found",
+      });
+    }
+
+    await syncElectionStatus(election);
+
+    // ----------------------------
+    // Election Constituencies
+    // ----------------------------
+
+    const constituencies = await Constituency.find(
+      { electionId: election._id },
+      "masterConstituencyId"
+    );
+
+    const constituencyCount = constituencies.length;
+
+    const masterIds = constituencies.map(
+      (c) => c.masterConstituencyId
+    );
+
+    // ----------------------------
+    // Voter Query
+    // ----------------------------
+
+    let voterQuery = {};
+
+    switch (election.type) {
+      case "Lok Sabha":
+        voterQuery = {
+          "constituencies.lokSabha": {
+            $in: masterIds,
+          },
+        };
+        break;
+
+      case "Assembly":
+        voterQuery = {
+          "constituencies.assembly": {
+            $in: masterIds,
+          },
+        };
+        break;
+
+      case "Municipal":
+        voterQuery = {
+          "constituencies.municipal": {
+            $in: masterIds,
+          },
+        };
+        break;
+
+      default:
+        voterQuery = {
+          _id: null,
+        };
+    }
+
+    // ----------------------------
+    // Statistics
+    // ----------------------------
+
+    const [
+      adminCount,
+      candidateCount,
+      voterCount,
+    ] = await Promise.all([
+      Admin.countDocuments({
+        electionId: election._id,
+      }),
+
+      Candidate.countDocuments({
+        electionId: election._id,
+      }),
+
+      Voter.countDocuments(voterQuery),
+    ]);
+
+    // ----------------------------
+    // Response
+    // ----------------------------
+
+    res.json({
+      election,
+      statistics: {
+        constituencies: constituencyCount,
+        admins: adminCount,
+        candidates: candidateCount,
+        voters: voterCount,
+      },
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+
+  }
+});
 router.put('/:electionId', async (req, res) => {
   try {
     const election = await Election.findById(req.params.electionId);
