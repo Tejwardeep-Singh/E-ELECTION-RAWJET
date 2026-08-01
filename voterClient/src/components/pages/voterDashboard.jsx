@@ -235,6 +235,9 @@ if (!selectedElectionData) {
 {selectedElectionData && (
     <ElectionStatusWidget
         election={selectedElectionData}
+        onViewResults={() =>
+        navigate(`/voter/results/${selectedElection}`)
+    }
     />
 )}
     {candidatesLoading ? <div className="py-12 text-center text-xs font-bold uppercase tracking-wider text-slate-400">Loading election candidates...</div> : candidates.length === 0 ? <div className="text-center py-12 bg-white border border-slate-200/60 rounded-2xl text-[#64748B] text-xs font-bold uppercase tracking-wider">No candidates are available for the selected election.</div> : <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{candidates.map((candidate) => <article key={candidate._id} className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between gap-6">

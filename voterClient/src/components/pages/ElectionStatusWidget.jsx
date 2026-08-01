@@ -8,10 +8,12 @@ import {
   AlertCircle,
   ShieldCheck,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function ElectionLifecycleCard({ election, onViewResults }) {
   const [timeLeft, setTimeLeft] = useState(0);
   const [phase, setPhase] = useState("loading");
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!election) return;
@@ -252,7 +254,7 @@ export default function ElectionLifecycleCard({ election, onViewResults }) {
           </p>
 
           <button
-            onClick={onViewResults}
+            onClick={() => onViewResults?.()}
             className="mt-8 rounded-xl bg-blue-600 px-6 py-3 text-white font-bold hover:bg-blue-700 transition"
           >
             View Election Results
