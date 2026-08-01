@@ -249,6 +249,10 @@ router.get("/results/:electionId", authenticateVoter, async (req, res) => {
   try {
     const { electionId } = req.params;
 
+    // -------------------------
+    // Logged-in voter
+    // -------------------------
+
     const voter = await Voter.findById(req.voterId);
 
     if (!voter) {
@@ -257,14 +261,31 @@ router.get("/results/:electionId", authenticateVoter, async (req, res) => {
       });
     }
 
+    // -------------------------
+    // Election
+    // -------------------------
+
     const election = await Election.findById(electionId);
-    await syncElectionStatus(election);
 
     if (!election) {
       return res.status(404).json({
         message: "Election not found",
       });
     }
+
+    // Automatically update status if required
+    await syncElectionStatus(election);
+
+    // Results must be published first
+    if (!election.resultVisible) {
+      return res.status(403).json({
+        message: "Election results have not been published yet.",
+      });
+    }
+
+    // -------------------------
+    // Find voter's constituency
+    // -------------------------
 
     let constituencyId = null;
 
@@ -289,27 +310,116 @@ router.get("/results/:electionId", authenticateVoter, async (req, res) => {
 
     if (!constituencyId) {
       return res.status(404).json({
-        message: "You are not assigned to a constituency for this election.",
+        message:
+          "You are not assigned to a constituency for this election.",
       });
     }
 
-    const candidates = await Candidate.find({
-      electionId: election._id,
-      constituencyId,
-    }).sort({ voteCount: -1 });
+    // -------------------------
+    // Candidates
+    // -------------------------
+
+    const electionConstituency = await Constituency.findOne({
+    electionId: election._id,
+    masterConstituencyId: constituencyId,
+});
+
+if (!electionConstituency) {
+    return res.status(404).json({
+        message: "Constituency not found for this election."
+    });
+}
+
+const candidates = await Candidate.find({
+    electionId: election._id,
+    constituencyId: electionConstituency._id,
+})
+.select(
+    "name voteCount candidateImage partyImage criminalCase constituencyId"
+)
+.sort({ voteCount: -1 });
+
+    // -------------------------
+    // Statistics
+    // -------------------------
+
+    const totalVotes = candidates.reduce(
+      (sum, candidate) => sum + (candidate.voteCount || 0),
+      0
+    );
+
+    const rankedCandidates = candidates.map((candidate, index) => ({
+      ...candidate.toObject(),
+
+      rank: index + 1,
+
+      percentage:
+        totalVotes > 0
+          ? Number(
+              (
+                (candidate.voteCount / totalVotes) *
+                100
+              ).toFixed(2)
+            )
+          : 0,
+    }));
+
+    const winner =
+      rankedCandidates.length > 0
+        ? rankedCandidates[0]
+        : null;
+
+    const runnerUp =
+      rankedCandidates.length > 1
+        ? rankedCandidates[1]
+        : null;
+
+    const winnerMargin =
+      winner && runnerUp
+        ? winner.voteCount - runnerUp.voteCount
+        : winner
+        ? winner.voteCount
+        : 0;
+
+    // -------------------------
+    // Response
+    // -------------------------
 
     res.json({
       election: {
         _id: election._id,
         title: election.title,
+        description: election.description,
         type: election.type,
         status: election.status,
-      },
-      candidates,
-    });
 
+        state: election.state,
+        district: election.district,
+        city: election.city,
+
+        startDate: election.startDate,
+        endDate: election.endDate,
+
+        resultVisible: election.resultVisible,
+        resultPublishedAt:
+          election.resultPublishedAt,
+      },
+
+      statistics: {
+        totalVotes,
+        candidateCount:
+          rankedCandidates.length,
+        winnerMargin,
+      },
+
+      winner,
+
+      runnerUp,
+
+      candidates: rankedCandidates,
+    });
   } catch (err) {
-    console.error("Error fetching candidates:", err);
+    console.error("Error fetching results:", err);
 
     res.status(500).json({
       message: "Server error",

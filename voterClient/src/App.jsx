@@ -17,7 +17,7 @@ export default function App() {
         <Route path="/voter/login" element={<VoterLogin />} />
         <Route path="/voter/register" element={<VoterRegister />} />
         <Route path="/voter/dashboard" element={<VoterDashboard />} />
-        <Route path="/voter/results" element={<VoterResults />} />
+        <Route path="/voter/results/:electionId" element={<VoterResults />} />
       </Routes>
       <Copywright />
     </>
