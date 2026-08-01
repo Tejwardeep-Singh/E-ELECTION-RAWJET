@@ -13,7 +13,7 @@ const CountdownTimer = ({ onElectionEnd }) => {
     const fetchTimer = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/api/election/timer`
+          `${import.meta.env.VITE_API_BASE_URL}/api/election/timer/${selectedElection._id}`
         );
 
         const { timeRemaining, status: serverStatus } = res.data;

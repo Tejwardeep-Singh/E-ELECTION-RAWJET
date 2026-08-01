@@ -92,7 +92,6 @@ router.get('/candidate/by-area/:area', async (req, res) => {
 // View all candidates
 router.get("/candidate/view", authenticate, loadAdmin, async (req, res) => {
   try {
-    console.log("===== CANDIDATE VIEW ROUTE HIT =====");
     const candidates = await Candidate.find({
       electionId: req.admin.electionId,
       constituencyId: req.admin.constituencyId,
@@ -102,7 +101,6 @@ router.get("/candidate/view", authenticate, loadAdmin, async (req, res) => {
         "constituencyName constituencyNumber state district city"
       )
       .populate("electionId", "title type");
-      console.log(JSON.stringify(candidates, null, 2));
 
     res.json(candidates);
   } catch (err) {

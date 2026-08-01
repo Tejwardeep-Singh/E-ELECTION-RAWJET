@@ -10,6 +10,7 @@ const authenticate = require('../middlewares/authenticate');
 const authorizeHead = require('../middlewares/authorizeHead');
 const { validateElectionAssignment } = require('../services/electionScope');
 const electionConfigs = require("../config/electionConfig");
+const syncElectionStatus = require("../services/syncElectionStatus");
 
 router.use(authenticate, authorizeHead);
 
@@ -190,19 +191,46 @@ router.post('/set', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-router.post('/show-results', async (req, res) => {
-  try {
-    const config = await electionConfig.findOne();
-    if (!config) return res.status(404).json({ message: 'Election config not found' });
+// router.post("/show-results/:electionId", async (req, res) => {
+//   try {
+//     const { electionId } = req.params;
 
-    config.resultVisible = true;
-    await config.save();
+//     const election = await Election.findById(electionId);
 
-    res.status(200).json({ message: 'Results are now visible to everyone' });
-  } catch (err) {
-    console.error('Error setting result visibility:', err);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+//     if (!election) {
+//       return res.status(404).json({
+//         message: "Election not found."
+//       });
+//     }
+
+//     if (election.status !== "Completed") {
+//       return res.status(400).json({
+//         message: "Only completed elections can have their results published."
+//       });
+//     }
+
+//     if (election.resultVisible) {
+//       return res.status(400).json({
+//         message: "Results have already been published."
+//       });
+//     }
+
+//     election.resultVisible = true;
+
+//     await election.save();
+
+//     res.status(200).json({
+//       message: "Results are now visible to voters.",
+//       election
+//     });
+
+//   } catch (err) {
+//     console.error("Error publishing results:", err);
+
+//     res.status(500).json({
+//       message: "Server error."
+//     });
+//   }
+// });
 module.exports = router;
 

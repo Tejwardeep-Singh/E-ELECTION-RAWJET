@@ -37,8 +37,6 @@ async function migrateVoters() {
     },
     { $unset: ['area', 'city', 'state', 'photo'] },
   ]);
-
-  console.log(`Migrated ${result.modifiedCount} voter record(s).`);
   await mongoose.disconnect();
 }
 

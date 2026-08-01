@@ -30,9 +30,7 @@ export default function VoterDashboard() {
   const [selectedElectionData, setSelectedElectionData] = useState(null);
   const [alreadyVoted, setAlreadyVoted] = useState(false);
   const [declaration, setDeclaration] = useState(null);
-  
   const triggerAlert = (type, message) => setAlertConfig({ isOpen: true, type, message });
-
   const loadCandidates = useCallback(async () => {
 
     if (!selectedElection) return;

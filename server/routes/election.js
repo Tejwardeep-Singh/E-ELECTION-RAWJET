@@ -7,6 +7,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const ElectionConfig = require('../models/elections');
 const moment = require('moment-timezone'); 
+const Election = require("../models/election");
+const syncElectionStatus = require("../services/syncElectionStatus");
 
 
 // Get election live status
@@ -48,62 +50,81 @@ router.get('/get', async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch election timings' });
   }
 });
-router.get('/timer', async (req, res) => {
+router.get("/timer/:electionId", async (req, res) => {
   try {
+    const { electionId } = req.params;
 
-    const config = await ElectionConfig.findOne();
+    const election = await Election.findById(electionId);
+    console.log("Election:", election.title);
+console.log("Status:", election.status);
+console.log("Now:", new Date());
+console.log("Start:", election.startDate);
+console.log("End:", election.endDate);
+console.log("Now >= End ?", new Date() >= new Date(election.endDate));
 
-    if (!config) {
+    if (!election) {
       return res.status(404).json({
-        message: 'Election config not found'
+        message: "Election not found",
       });
     }
 
-    const now = moment().tz('Asia/Kolkata');
+    const now = new Date();
 
-    const startTime = moment.tz(config.startTime, 'Asia/Kolkata');
+    const startDate = new Date(election.startDate);
 
-    const endTime = moment.tz(config.endTime, 'Asia/Kolkata');
+    const endDate = new Date(election.endDate);
 
-    const electionLive = now.isBetween(startTime, endTime);
+    // -------------------------
+    // Automatic Status Updates
+    // -------------------------
 
-    const timeRemaining = electionLive
-      ? Math.max(0, endTime.diff(now))
-      : 0;
+   if (
+    election.status === "Active" &&
+    now >= endDate
+) {
+    console.log("AUTO COMPLETING ELECTION");
 
-    let status = 'reset';
+    election.status = "Completed";
 
-if (config.resultVisible) {
+    await election.save();
 
-  status = 'resultLive';
-
-} else if (electionLive) {
-
-  status = 'live';
-
-} else if (now.isBefore(startTime)) {
-
-  status = 'upcoming';
-
-} else if (now.isAfter(endTime)) {
-
-  status = 'ended';
-
+    console.log("Saved:", election.status);
 }
+    if (
+      election.status === "Draft" &&
+      now >= startDate &&
+      now < endDate
+    ) {
+      election.status = "Active";
+      await election.save();
+    }
 
-    // Auto update
-    if (now.isAfter(endTime) && !config.resultVisible) {
-      config.electionLive = false;
-      await config.save();
+    // -------------------------
+    // Timer
+    // -------------------------
+
+    let timeRemaining = 0;
+
+    if (election.status === "Active") {
+      timeRemaining = Math.max(
+        0,
+        endDate.getTime() - now.getTime()
+      );
+    } else if (election.status === "Draft") {
+      timeRemaining = Math.max(
+        0,
+        startDate.getTime() - now.getTime()
+      );
     }
 
     res.json({
-      status,
+      electionId: election._id,
+      title: election.title,
+      status: election.status,
+      resultVisible: election.resultVisible,
+      startDate: election.startDate,
+      endDate: election.endDate,
       timeRemaining,
-      electionLive,
-      resultVisible: config.resultVisible,
-      startTime: config.startTime,
-      endTime: config.endTime
     });
 
   } catch (err) {
@@ -111,9 +132,10 @@ if (config.resultVisible) {
     console.error(err);
 
     res.status(500).json({
-      message: 'Server error'
+      message: "Server error",
     });
 
   }
 });
+
 module.exports = router;

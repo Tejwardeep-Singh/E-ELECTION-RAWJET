@@ -11,6 +11,7 @@ async function validateElectionAssignment(electionId, constituencyId) {
     Election.findById(electionId),
     getConstituencyForElection(electionId, constituencyId),
   ]);
+  
   if (!election) throw new Error('Election not found');
   if (!constituency) throw new Error('Constituency does not belong to the selected election');
   if (election.status === 'Archived') throw new Error('Archived elections are read-only');

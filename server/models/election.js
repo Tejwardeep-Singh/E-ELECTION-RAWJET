@@ -73,6 +73,14 @@ const electionSchema = new mongoose.Schema(
         ref: "head",
         required: true,
     },
+    resultVisible: {
+    type: Boolean,
+    default: false
+},
+resultPublishedAt: {
+    type: Date,
+    default: null
+}
 },
 {
     timestamps: true,

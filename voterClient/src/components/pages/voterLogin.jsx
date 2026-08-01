@@ -125,15 +125,7 @@ export default function VoterLogin() {
 
         </form>
 
-        {/* Navigation Alternate Pathways */}
-        <div className="pt-4 border-t border-slate-100 text-center">
-          <p className="text-xs font-semibold text-[#64748B]">
-            Not registered yet?{' '}
-            <Link to="/voter/register" className="text-blue-600 hover:text-blue-700 hover:underline transition-colors ml-0.5">
-              Register credential profile
-            </Link>
-          </p>
-        </div>
+        
 
       </div>
     </main>

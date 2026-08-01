@@ -17,8 +17,6 @@ async function processPhoto(epicNumber, photoFileName) {
         "../../storage/original",
         newFileName
     );
-    console.log(sourcePath);
-console.log(await fs.access(sourcePath).then(() => "Exists").catch(() => "Not Found"));
 
     await fs.copyFile(sourcePath, destinationPath);
 

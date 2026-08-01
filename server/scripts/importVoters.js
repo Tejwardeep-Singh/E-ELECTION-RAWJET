@@ -14,7 +14,6 @@ const Voter = require("../models/Voter");
 
 async function importVoters() {
     await mongoose.connect(process.env.MONGO_URI);
-    console.log("MongoDB Connected");
     const session = await mongoose.startSession();
     try {
         const photoFolder = path.join(
@@ -26,31 +25,23 @@ async function importVoters() {
             "../imports/voters.xlsx"
         );
         const voters = readExcel(excelPath);
-        console.log(`Found ${voters.length} voters`);
         const basicErrors = validateBasic(voters,photoFolder);
         if (basicErrors.length > 0) {
-            console.log("\n❌ Basic Validation Failed\n");
             console.table(basicErrors);
             return;
         }
         const dbErrors = await validateDatabase(voters);
         if (dbErrors.length > 0) {
-            console.log("\n❌ Database Validation Failed\n");
             console.table(dbErrors);
 
             return;
         }
         const votersToInsert = [];
         for (const voter of voters) {
-            console.log(`Processing ${voter.epicNumber}...`);
-            console.log("EPIC:", voter.epicNumber);
-console.log("DOB Value:", voter.dob);
-console.log("DOB Type:", typeof voter.dob);
             const defaultPassword = generateDefaultPassword(
                 voter.epicNumber,
                 voter.dob
             );
-            console.log("Generated:", defaultPassword);
             const hashedPassword =
                 await hashPassword(defaultPassword);
             const photo =
@@ -74,11 +65,6 @@ console.log("DOB Type:", typeof voter.dob);
             }
         );
         await session.commitTransaction();
-        console.log("\n====================================");
-        console.log("✅ Import Successful");
-        console.log("====================================");
-        console.log(`Imported : ${votersToInsert.length}`);
-        console.log("====================================\n");
     }
     catch (err) {
          if (session.inTransaction()) {
@@ -91,7 +77,6 @@ console.log("DOB Type:", typeof voter.dob);
     finally {
         session.endSession();
         await mongoose.disconnect();
-        console.log("MongoDB Disconnected");
     }
 }
 

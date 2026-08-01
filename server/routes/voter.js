@@ -11,12 +11,13 @@ const { enrollVoterFace } = require('../services/faceEnrollment');
 const Election = require("../models/election");
 const Constituency = require("../models/constituency");
 const Participation = require("../models/participation");
+const syncElectionStatus = require("../services/syncElectionStatus");
 
 const uploadVoterImage = (req, res, next) => {
 
   voterUpload.single("photoUrl")(req, res, (error) => {
 
-    console.log("After multer");
+    
 
     if (error) {
       console.error(error);
@@ -25,7 +26,6 @@ const uploadVoterImage = (req, res, next) => {
       });
     }
 
-    console.log(req.file);
     next();
   });
 };
@@ -126,8 +126,7 @@ router.get("/me", authenticateVoter, async (req, res) => {
 
         if (!voter)
             return res.status(404).json({ message: "Voter not found" });
-          console.log(voter.photoUrl);
-console.log(voter.photo);
+          
         res.json(voter);
 
     } catch (err) {
@@ -259,6 +258,7 @@ router.get("/results/:electionId", authenticateVoter, async (req, res) => {
     }
 
     const election = await Election.findById(electionId);
+    await syncElectionStatus(election);
 
     if (!election) {
       return res.status(404).json({
@@ -320,12 +320,25 @@ router.get("/results/:electionId", authenticateVoter, async (req, res) => {
 router.get("/elections", authenticateVoter, async (req, res) => {
   try {
     const elections = await Election.find({
-      status: { $in: ["Draft", "Active"] },
-    })
+  $or: [
+    {
+      status: {
+        $in: ["Draft", "Active"]
+      }
+    },
+    {
+      status: "Completed",
+      resultVisible: true
+    }
+  ]
+})
       .select(
         "_id title type status startTime endTime state district city createdAt"
       )
       .sort({ createdAt: -1 });
+      await Promise.all(
+    elections.map(syncElectionStatus)
+);
 
     res.status(200).json(elections);
 
@@ -348,6 +361,7 @@ router.get("/candidates/:electionId", authenticateVoter, async (req, res) => {
     }
 
     const election = await Election.findById(req.params.electionId);
+    await syncElectionStatus(election);
     const alreadyVoted = await Participation.exists({
   voterId: voter._id,
   electionId: election._id,
@@ -407,8 +421,6 @@ const candidates = await Candidate.find({
     "constituencyName constituencyNumber"
   )
   .sort({ name: 1 });
-  console.log("Master Constituency:", constituencyId);
-console.log("Election Constituency:", electionConstituency);
     res.json({
       election,
       alreadyVoted: !!alreadyVoted,

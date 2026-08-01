@@ -26,9 +26,6 @@ async function migrateJurisdictions() {
       { 'address.area': { $exists: false } },
     ],
   });
-
-  console.log(`Migrated ${result.modifiedCount} candidate record(s).`);
-  console.log(`${unassignedAdmins} existing admin(s) require a Head-assigned jurisdiction.`);
   await mongoose.disconnect();
 }
 

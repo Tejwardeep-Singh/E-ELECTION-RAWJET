@@ -1,218 +1,289 @@
 import { useEffect, useState } from "react";
 import {
   Clock3,
-  ShieldCheck,
-  AlertCircle,
   CalendarClock,
   CheckCircle2,
+  Vote,
+  Trophy,
+  AlertCircle,
+  ShieldCheck,
 } from "lucide-react";
 
-const ElectionStatusWidget = ({ election }) => {
+export default function ElectionLifecycleCard({ election, onViewResults }) {
   const [timeLeft, setTimeLeft] = useState(0);
+  const [phase, setPhase] = useState("loading");
 
   useEffect(() => {
     if (!election) return;
 
-    const updateTimer = () => {
+    const tick = () => {
       const now = Date.now();
 
-      let remaining = 0;
+      const start = new Date(election.startDate).getTime();
+      const end = new Date(election.endDate).getTime();
 
-      if (election.status === "Active") {
-        remaining =
-          new Date(election.endDate).getTime() - now;
-      } else if (election.status === "Draft") {
-        remaining =
-          new Date(election.startDate).getTime() - now;
+      if (election.status === "Archived") {
+        setPhase("archived");
+        return;
       }
 
-      setTimeLeft(Math.max(remaining, 0));
+      if (election.resultVisible) {
+        setPhase("published");
+        return;
+      }
+
+      if (now < start) {
+        setPhase("upcoming");
+        setTimeLeft(start - now);
+        return;
+      }
+
+      if (now < end) {
+        setPhase("live");
+        setTimeLeft(end - now);
+        return;
+      }
+
+      setPhase("completed");
+      setTimeLeft(0);
     };
 
-    updateTimer();
+    tick();
 
-    const interval = setInterval(updateTimer, 1000);
+    const interval = setInterval(tick, 1000);
 
     return () => clearInterval(interval);
   }, [election]);
 
   if (!election) return null;
 
-  const formatTime = (milliseconds) => {
-    const totalSeconds = Math.floor(milliseconds / 1000);
+  const total = Math.floor(timeLeft / 1000);
 
-    const days = Math.floor(totalSeconds / 86400);
+  const days = Math.floor(total / 86400);
 
-    const hrs = Math.floor((totalSeconds % 86400) / 3600);
+  const hours = String(
+    Math.floor((total % 86400) / 3600)
+  ).padStart(2, "0");
 
-    const mins = Math.floor((totalSeconds % 3600) / 60);
+  const minutes = String(
+    Math.floor((total % 3600) / 60)
+  ).padStart(2, "0");
 
-    const secs = totalSeconds % 60;
+  const seconds = String(total % 60).padStart(2, "0");
 
-    return {
-      days,
-      hrs: String(hrs).padStart(2, "0"),
-      mins: String(mins).padStart(2, "0"),
-      secs: String(secs).padStart(2, "0"),
-    };
-  };
-
-  const { days, hrs, mins, secs } = formatTime(timeLeft);
-
-  // ---------------- Draft ----------------
-
-  if (election.status === "Draft") {
-    return (
-      <div className="w-full rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <div className="flex items-center gap-2">
-          <CalendarClock className="text-amber-600" size={18} />
-          <span className="font-black uppercase text-xs tracking-wider text-amber-700">
-            Upcoming Election
-          </span>
-        </div>
-
-        <p className="mt-2 text-lg font-black text-slate-900">
-          {election.title}
-        </p>
-
-        <p className="mt-1 text-sm text-slate-600">
-          Voting begins in
-        </p>
-
-        <div className="mt-4 flex gap-2 font-mono">
-          <TimeBox value={days} label="Days" />
-          <TimeBox value={hrs} label="Hours" />
-          <TimeBox value={mins} label="Minutes" />
-          <TimeBox value={secs} label="Seconds" />
-        </div>
-      </div>
-    );
-  }
-
-  // ---------------- Active ----------------
-
-  if (election.status === "Active") {
-    return (
-      <div className="w-full rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm">
-
-        <div className="flex justify-between items-center">
-
-          <div className="flex items-center gap-2">
-
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-70" />
-              <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500" />
-            </span>
-
-            <ShieldCheck
-              size={18}
-              className="text-emerald-600"
-            />
-
-            <span className="text-xs font-black uppercase tracking-wider text-emerald-700">
-              Election Live
-            </span>
-
-          </div>
-
-          <div className="flex items-center gap-1 text-slate-500 text-xs">
-            <Clock3 size={14} />
-            Ends Soon
-          </div>
-
-        </div>
-
-        <h2 className="mt-3 text-xl font-black text-slate-900">
-          {election.title}
-        </h2>
-
-        <div className="mt-5 flex gap-2 font-mono">
-          <TimeBox value={days} label="Days" />
-          <TimeBox value={hrs} label="Hours" />
-          <TimeBox value={mins} label="Minutes" />
-          <TimeBox value={secs} label="Seconds" />
-        </div>
-
-      </div>
-    );
-  }
-
-  // ---------------- Completed ----------------
-
-  if (election.status === "Completed") {
-    return (
-      <div className="w-full rounded-2xl border border-red-200 bg-red-50 p-5">
-
-        <div className="flex items-center gap-2">
-
-          <AlertCircle
-            size={18}
-            className="text-red-600"
-          />
-
-          <span className="font-black uppercase text-xs tracking-wider text-red-700">
-            Voting Closed
-          </span>
-
-        </div>
-
-        <h2 className="mt-3 text-lg font-black">
-          {election.title}
-        </h2>
-
-        <p className="mt-2 text-sm text-slate-600">
-          This election has concluded.
-          Results will be published by the Election Commission.
-        </p>
-
-      </div>
-    );
-  }
-
-  // ---------------- Archived ----------------
-
-  return (
-    <div className="w-full rounded-2xl border border-slate-200 bg-slate-100 p-5">
-
-      <div className="flex items-center gap-2">
-
-        <CheckCircle2
-          size={18}
-          className="text-slate-600"
-        />
-
-        <span className="font-black uppercase text-xs tracking-wider text-slate-700">
-          Election Archived
-        </span>
-
-      </div>
-
-      <h2 className="mt-3 text-lg font-black">
-        {election.title}
-      </h2>
-
-      <p className="mt-2 text-sm text-slate-600">
-        This election has been archived.
-      </p>
-
-    </div>
-  );
-};
-
-function TimeBox({ value, label }) {
-  return (
-    <div className="flex flex-col items-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 min-w-[72px]">
-
-      <span className="text-2xl font-black text-slate-900">
-        {value}
-      </span>
-
-      <span className="mt-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+  const TimeBox = ({ value, label }) => (
+    <div className="flex flex-col items-center rounded-2xl bg-slate-50 border border-slate-200 px-5 py-4 min-w-[85px]">
+      <span className="text-3xl font-black text-slate-900">{value}</span>
+      <span className="mt-1 text-[10px] uppercase tracking-wider text-slate-500 font-bold">
         {label}
       </span>
-
     </div>
   );
-}
 
-export default ElectionStatusWidget;
+  const formatDate = (date) =>
+    new Date(date).toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  const renderCountdown = () => (
+    <div className="mt-6 flex justify-center gap-3 flex-wrap">
+      <TimeBox value={days} label="Days" />
+      <TimeBox value={hours} label="Hours" />
+      <TimeBox value={minutes} label="Minutes" />
+      <TimeBox value={seconds} label="Seconds" />
+    </div>
+  );
+
+  switch (phase) {
+    case "upcoming":
+      return (
+        <div className="rounded-3xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-8 shadow-sm">
+
+          <div className="flex items-center gap-3">
+            <CalendarClock className="text-amber-600" size={26} />
+            <div>
+              <p className="text-xs uppercase font-black tracking-widest text-amber-700">
+                Upcoming Election
+              </p>
+
+              <h2 className="text-2xl font-black text-slate-900">
+                {election.title}
+              </h2>
+            </div>
+          </div>
+
+          <p className="mt-6 text-slate-600">
+            Voting begins in
+          </p>
+
+          {renderCountdown()}
+
+          <div className="mt-8 rounded-2xl bg-white border border-amber-100 p-4">
+            <p className="text-xs uppercase font-bold tracking-wider text-slate-500">
+              Starts On
+            </p>
+
+            <p className="mt-1 text-lg font-bold">
+              {formatDate(election.startDate)}
+            </p>
+          </div>
+
+        </div>
+      );
+
+    case "live":
+      return (
+        <div className="rounded-3xl border border-emerald-200 bg-white p-8 shadow-lg">
+
+          <div className="flex justify-between items-start">
+
+            <div>
+
+              <div className="flex items-center gap-2">
+
+                <span className="relative flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 animate-ping" />
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-500" />
+                </span>
+
+                <span className="text-xs uppercase tracking-widest font-black text-emerald-700">
+                  Election Live
+                </span>
+
+              </div>
+
+              <h2 className="mt-3 text-3xl font-black">
+                {election.title}
+              </h2>
+
+            </div>
+
+            <Vote size={42} className="text-emerald-600" />
+
+          </div>
+
+          {renderCountdown()}
+
+          <div className="mt-8 grid md:grid-cols-2 gap-4">
+
+            <div className="rounded-2xl border bg-slate-50 p-4">
+              <p className="text-xs uppercase font-bold text-slate-500">
+                Voting Ends
+              </p>
+
+              <p className="mt-2 font-black text-lg">
+                {formatDate(election.endDate)}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border bg-blue-50 p-4">
+              <p className="text-xs uppercase font-bold text-blue-600">
+                Election Type
+              </p>
+
+              <p className="mt-2 font-black text-lg">
+                {election.type}
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+      );
+
+    case "completed":
+      return (
+        <div className="rounded-3xl border border-red-200 bg-red-50 p-8">
+
+          <div className="flex items-center gap-3">
+
+            <AlertCircle size={28} className="text-red-600" />
+
+            <div>
+
+              <p className="text-xs uppercase font-black tracking-widest text-red-700">
+                Voting Closed
+              </p>
+
+              <h2 className="text-2xl font-black">
+                {election.title}
+              </h2>
+
+            </div>
+
+          </div>
+
+          <p className="mt-6 text-slate-700 leading-7">
+            Voting has concluded successfully.
+            The Election Commission is currently verifying and publishing the official results.
+          </p>
+
+        </div>
+      );
+
+    case "published":
+      return (
+        <div className="rounded-3xl border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 p-8">
+
+          <div className="flex items-center gap-3">
+
+            <Trophy size={30} className="text-blue-600" />
+
+            <div>
+
+              <p className="text-xs uppercase tracking-widest font-black text-blue-700">
+                Results Published
+              </p>
+
+              <h2 className="text-2xl font-black">
+                {election.title}
+              </h2>
+
+            </div>
+
+          </div>
+
+          <p className="mt-5 text-slate-700">
+            Official election results have been published.
+          </p>
+
+          <button
+            onClick={onViewResults}
+            className="mt-8 rounded-xl bg-blue-600 px-6 py-3 text-white font-bold hover:bg-blue-700 transition"
+          >
+            View Election Results
+          </button>
+
+        </div>
+      );
+
+    default:
+      return (
+        <div className="rounded-3xl border border-slate-200 bg-slate-100 p-8">
+
+          <div className="flex items-center gap-3">
+
+            <CheckCircle2 size={26} />
+
+            <div>
+
+              <p className="text-xs uppercase tracking-widest font-black">
+                Archived
+              </p>
+
+              <h2 className="text-2xl font-black">
+                {election.title}
+              </h2>
+
+            </div>
+
+          </div>
+
+        </div>
+      );
+  }
+}
