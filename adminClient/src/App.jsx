@@ -86,13 +86,27 @@ function Elections({ notify }) {
 
   const run = async () => {
     try {
-      await api(
+      if (confirm.path === "/reset") {
+
+    await api(
+        `/api/head/elections/${confirm.id}/reset`,
+        {
+            role: "head",
+            method: "DELETE",
+        }
+    );
+
+} else {
+
+    await api(
         `/api/head/elections/${confirm.id}${confirm.path}`,
         {
-          role: "head",
-          method: confirm.method,
+            role: "head",
+            method: confirm.method,
         }
-      );
+    );
+
+}
 
       notify(confirm.success);
 
@@ -319,18 +333,18 @@ function Elections({ notify }) {
                           </span>
 
                           <button
-                            className="text-slate-600"
-                            onClick={() =>
-                              setConfirm({
-                                id: x._id,
-                                path: "/archive",
-                                method: "POST",
-                                success: "Election archived.",
-                              })
-                            }
-                          >
-                            <Archive size={16} />
-                          </button>
+    className="rounded-lg bg-red-600 px-3 py-1 text-xs font-semibold text-white hover:bg-red-700"
+    onClick={() =>
+        setConfirm({
+            id: x._id,
+            path: "/reset",
+            method: "DELETE",
+            success: "Election reset successfully.",
+        })
+    }
+>
+    Reset Election
+</button>
                         </>
                       )}
                     </>
@@ -373,7 +387,92 @@ function Elections({ notify }) {
           title={editor._id ? "Edit Election" : "Create Election"}
           onClose={() => setEditor(null)}
         >
-          {/* Your existing form remains unchanged */}
+          <form onSubmit={save} className="space-y-4">
+
+  <Field
+    label="Election Title"
+    name="title"
+    required
+    defaultValue={editor.title}
+  />
+
+  <Select
+    label="Election Type"
+    name="type"
+    value={selectedType}
+    onChange={(e) => setSelectedType(e.target.value)}
+  >
+    {Object.keys(electionConfig).map((type) => (
+      <option key={type} value={type}>
+        {type}
+      </option>
+    ))}
+  </Select>
+
+  {locationFields.state && (
+    <Field
+      label="State"
+      name="state"
+      required
+      defaultValue={editor.state}
+    />
+  )}
+
+  {locationFields.district && (
+    <Field
+      label="District"
+      name="district"
+      required
+      defaultValue={editor.district}
+    />
+  )}
+
+  {locationFields.city && (
+    <Field
+      label="City"
+      name="city"
+      required
+      defaultValue={editor.city}
+    />
+  )}
+
+  <div className="grid grid-cols-2 gap-3">
+
+    <Field
+      label="Start Date & Time"
+      name="startDate"
+      type="datetime-local"
+      required
+      defaultValue={toInputDate(editor.startDate)}
+    />
+
+    <Field
+      label="End Date & Time"
+      name="endDate"
+      type="datetime-local"
+      required
+      defaultValue={toInputDate(editor.endDate)}
+    />
+
+  </div>
+
+  <div className="flex justify-end gap-2">
+
+    <Button
+      type="button"
+      className="bg-slate-100 text-slate-700"
+      onClick={() => setEditor(null)}
+    >
+      Cancel
+    </Button>
+
+    <Button type="submit">
+      {editor._id ? "Update Election" : "Create Election"}
+    </Button>
+
+  </div>
+
+</form>
         </Modal>
       )}
 
@@ -381,11 +480,29 @@ function Elections({ notify }) {
 
       {confirm && (
         <Confirm
-          title="Confirm Action"
-          text="This action cannot be undone."
-          onClose={() => setConfirm(null)}
-          onConfirm={run}
-        />
+    title={
+        confirm.path === "/reset"
+            ? "Reset Election?"
+            : "Confirm Action"
+    }
+    text={
+        confirm.path === "/reset"
+            ? `This will permanently delete:
+
+• Election
+• Candidates
+• Admins
+• Constituencies
+• Participation Records
+
+Voters, Face Profiles and Master Constituencies will NOT be deleted.
+
+This action cannot be undone.`
+            : "This action cannot be undone."
+    }
+    onClose={() => setConfirm(null)}
+    onConfirm={run}
+/>
       )}
     </Page>
   );

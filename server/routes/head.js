@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 const Admin = require("../models/admin");
@@ -11,6 +12,9 @@ const authorizeHead = require('../middlewares/authorizeHead');
 const { validateElectionAssignment } = require('../services/electionScope');
 const electionConfigs = require("../config/electionConfig");
 const syncElectionStatus = require("../services/syncElectionStatus");
+const Constituency = require("../models/constituency");
+const Participation = require("../models/participation");
+const Election = require("../models/election");
 
 router.use(authenticate, authorizeHead);
 
@@ -115,9 +119,78 @@ router.get("/view", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-router.delete("/delete/:id", async (req, res) => {
-  await Admin.findByIdAndDelete(req.params.id);
-  res.sendStatus(204);
+// router.delete("/delete/:id", async (req, res) => {
+//   await Admin.findByIdAndDelete(req.params.id);
+//   res.sendStatus(204);
+// });
+router.delete("/elections/:electionId/reset", async (req, res) => {
+
+    const session = await mongoose.startSession();
+
+    try {
+
+        session.startTransaction();
+
+        const { electionId } = req.params;
+
+        const election = await Election.findById(electionId).session(session);
+
+        if (!election) {
+            await session.abortTransaction();
+            session.endSession();
+
+            return res.status(404).json({
+                message: "Election not found"
+            });
+        }
+
+        await Participation.deleteMany(
+            { electionId },
+            { session }
+        );
+
+        await Candidate.deleteMany(
+            { electionId },
+            { session }
+        );
+
+        await Admin.deleteMany(
+            { electionId },
+            { session }
+        );
+
+        await Constituency.deleteMany(
+            { electionId },
+            { session }
+        );
+
+        await Election.findByIdAndDelete(
+            electionId,
+            { session }
+        );
+
+        await session.commitTransaction();
+
+        session.endSession();
+
+        res.json({
+            message: "Election reset successfully."
+        });
+
+    } catch (err) {
+
+        await session.abortTransaction();
+
+        session.endSession();
+
+        console.error(err);
+
+        res.status(500).json({
+            message: "Failed to reset election."
+        });
+
+    }
+
 });
 router.put("/edit/:id", async (req, res) => {
   try {
