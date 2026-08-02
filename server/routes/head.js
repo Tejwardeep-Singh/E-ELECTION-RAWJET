@@ -15,7 +15,6 @@ const syncElectionStatus = require("../services/syncElectionStatus");
 const Constituency = require("../models/constituency");
 const Participation = require("../models/participation");
 const Election = require("../models/election");
-
 router.use(authenticate, authorizeHead);
 
 router.post("/add", async (req, res) => {
