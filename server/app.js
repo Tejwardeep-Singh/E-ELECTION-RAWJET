@@ -35,6 +35,7 @@ const resultsRouter = require('./routes/results');
 const electionManagementRoutes = require('./routes/electionManagement');
 const constituencyRoutes = require('./routes/constituencies');
 const headResultsRoutes = require("./routes/headResults");
+const adminResultsRoutes = require("./routes/adminResults");
 
 
 
@@ -48,6 +49,7 @@ app.use("/api/results",resultsRouter);
 app.use('/api/head/elections', electionManagementRoutes);
 app.use(['/api/constituencies', '/constituencies'], constituencyRoutes);
 app.use("/api/head/results", headResultsRoutes);
+app.use("/api/admin/results", adminResultsRoutes);
 
 
 connectDB().then(() => {
