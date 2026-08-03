@@ -958,6 +958,8 @@ BharatBallot
 
 Detailed technical documentation is available inside the **docs/** directory.
 
+<p align='center>
+
 | Document | Description |
 |----------|-------------|
 | 📐 ARCHITECTURE.md | Overall software architecture |
@@ -968,6 +970,8 @@ Detailed technical documentation is available inside the **docs/** directory.
 | ☁ DEPLOYMENT.md | Deployment Guide |
 | 📖 USER_GUIDE.md | User Manual |
 | 📘 SRS.md | Software Requirements Specification |
+
+</p>
 
 ---
 
@@ -1017,17 +1021,7 @@ Detailed technical documentation is available inside the **docs/** directory.
 
 # 🤝 Contributing
 
-Contributions are welcome.
-
-1. Fork the repository.
-
-2. Create a new feature branch.
-
-3. Commit your changes.
-
-4. Push your branch.
-
-5. Open a Pull Request.
+No Contributions needed.
 
 ---
 
@@ -1050,10 +1044,6 @@ For complete licensing information, please refer to the [LICENSE](LICENSE) file.
 # 👨‍💻 Developer
 
 **Tejwardeep Singh**
-
-B.Tech Computer Science & Engineering
-
-Full Stack Developer • AI Enthusiast • Open Source Contributor
 
 ---
 
