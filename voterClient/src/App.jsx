@@ -1,20 +1,25 @@
-import React from "react";
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Nav from './components/Nav';
+import Home from './components/pages/Home';
+import VoterLogin from './components/pages/voterLogin';
+import VoterRegister from './components/pages/voterRegister';
+import Copywright from './components/Copywright';
+import VoterDashboard from './components/pages/voterDashboard';
+import VoterResults from './components/pages/voterResults';
 
 export default function App() {
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "white",
-        color: "black",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontSize: "40px",
-        fontWeight: "bold",
-      }}
-    >
-      APP WORKS
-    </div>
+    <>
+      <Nav />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/voter/login" element={<VoterLogin />} />
+        <Route path="/voter/register" element={<VoterRegister />} />
+        <Route path="/voter/dashboard" element={<VoterDashboard />} />
+        <Route path="/voter/results/:electionId" element={<VoterResults />} />
+      </Routes>
+      <Copywright />
+    </>
   );
 }
