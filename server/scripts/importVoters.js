@@ -10,6 +10,7 @@ const createVoter = require("./helpers/createVoter");
 const hashPassword = require("./helpers/hashPassword");
 const generateDefaultPassword = require("../utils/generateDefaultPassword");
 const Voter = require("../models/Voter");
+const enrollFace = require("./helpers/enrollFace");
 
 
 async function importVoters() {
@@ -49,12 +50,34 @@ async function importVoters() {
                     voter.epicNumber,
                     voter.photo
                 );
+                const enrollment =
+    await enrollFace(
+        voter.epicNumber,
+        photo.original
+    );
             const document =
                 createVoter({
                     voter,
                     password: hashedPassword,
                     photo,
                 });
+                if (enrollment.success) {
+
+    document.biometric.enrolled = true;
+
+    document.biometric.faceEmbeddingPath =
+        enrollment.embeddingFile;
+
+    document.biometric.enrolledAt =
+        new Date();
+
+} else {
+
+    throw new Error(
+        `Face enrollment failed for ${voter.epicNumber}: ${enrollment.message}`
+    );
+
+}
             votersToInsert.push(document);
         }
         session.startTransaction();
@@ -65,6 +88,7 @@ async function importVoters() {
             }
         );
         await session.commitTransaction();
+        session.endSession();
     }
     catch (err) {
          if (session.inTransaction()) {

@@ -152,18 +152,15 @@ address: {
   }
 );
 voterSchema.index({
-  electionId: 1,
-  "constituencies.municipal": 1,
+    "constituencies.municipal": 1,
 });
 
 voterSchema.index({
-  electionId: 1,
-  "constituencies.assembly": 1,
+    "constituencies.assembly": 1,
 });
 
 voterSchema.index({
-  electionId: 1,
-  "constituencies.lokSabha": 1,
+    "constituencies.lokSabha": 1,
 });
 
 module.exports = mongoose.model("Voter", voterSchema);
