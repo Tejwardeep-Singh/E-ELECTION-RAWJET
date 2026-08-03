@@ -92,12 +92,16 @@ router.post('/register', uploadVoterImage, async (req, res) => {
 });
 router.post('/login', async (req, res) => {
     const { userId, password } = req.body;
+    console.log("Login Request:");
+console.log("User ID:", userId);
   
     try {
       const voter = await Voter.findOne({ userId });
+      console.log("Voter Found:", voter ? "YES" : "NO");
       if (!voter) return res.status(401).json({ message: 'Invalid user ID' });
   
       const isMatch = await bcrypt.compare(password, voter.password);
+      console.log("Password Match:", isMatch);
       if (!isMatch) return res.status(401).json({ message: 'Invalid password' });
   
       const token = jwt.sign({ role:"voter", voterId: voter._id }, JWT_KEY, { expiresIn: '2h' });
