@@ -181,7 +181,6 @@ const verifyFace = async () => {
             }
 
         );
-console.log(data);
         if (data.success && data.match) {
 
             setFaceVerification({

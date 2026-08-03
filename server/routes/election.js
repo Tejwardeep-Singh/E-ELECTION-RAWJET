@@ -55,12 +55,6 @@ router.get("/timer/:electionId", async (req, res) => {
     const { electionId } = req.params;
 
     const election = await Election.findById(electionId);
-    console.log("Election:", election.title);
-console.log("Status:", election.status);
-console.log("Now:", new Date());
-console.log("Start:", election.startDate);
-console.log("End:", election.endDate);
-console.log("Now >= End ?", new Date() >= new Date(election.endDate));
 
     if (!election) {
       return res.status(404).json({
@@ -82,13 +76,9 @@ console.log("Now >= End ?", new Date() >= new Date(election.endDate));
     election.status === "Active" &&
     now >= endDate
 ) {
-    console.log("AUTO COMPLETING ELECTION");
 
-    election.status = "Completed";
-
+    election.status = "Completed"
     await election.save();
-
-    console.log("Saved:", election.status);
 }
     if (
       election.status === "Draft" &&
