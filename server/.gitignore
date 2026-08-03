@@ -1,6 +1,3 @@
 node_modules
 .env
 seeds
-server/face/venv/
-__pycache__/
-*.pyc

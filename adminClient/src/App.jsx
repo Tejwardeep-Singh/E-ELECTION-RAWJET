@@ -13,7 +13,42 @@ import AdminResults from "./components/pages/AdminResults";
 import { api } from './services/api';
 
 function Toast({ toast, clear }) { return toast && <div className={`fixed right-5 top-5 z-[100] rounded-xl px-4 py-3 text-sm font-semibold shadow-lg ${toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'}`} onClick={clear}>{toast.message}</div>; }
-function Modal({ title, children, onClose }) { return <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 p-4"><section className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"><div className="mb-5 flex items-center justify-between"><h2 className="text-lg font-black text-slate-900">{title}</h2><button onClick={onClose} className="text-slate-400 hover:text-slate-900">×</button></div>{children}</section></div>; }
+function Modal({ title, children, onClose }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 p-4">
+
+      <section className="flex w-full max-w-5xl max-h-[90vh] flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+
+        {/* Header */}
+
+        <div className="flex items-center justify-between border-b px-6 py-4">
+
+          <h2 className="text-lg font-black text-slate-900">
+            {title}
+          </h2>
+
+          <button
+            onClick={onClose}
+            className="text-2xl text-slate-400 hover:text-slate-900"
+          >
+            ×
+          </button>
+
+        </div>
+
+        {/* Body */}
+
+        <div className="flex-1 overflow-y-auto p-6">
+
+          {children}
+
+        </div>
+
+      </section>
+
+    </div>
+  );
+}
 const Button = ({ children, className = '', ...props }) => <button className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold uppercase tracking-wider transition-colors ${className || 'bg-blue-600 text-white hover:bg-blue-700'}`} {...props}>{children}</button>;
 const Field = ({ label, ...props }) => <label className="block text-xs font-bold text-slate-600">{label}<input {...props} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-600" /></label>;
 const Select = ({ label, children, ...props }) => <label className="block text-xs font-bold text-slate-600">{label}<select {...props} className="mt-1.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-600">{children}</select></label>;
@@ -593,7 +628,14 @@ const save = async (ev) => {
 `${x.name}
 ${x.epicNumber || x.id}
 ${x.constituencyId?.constituencyName || ""}
-${x.constituencyId?.constituencyNumber || ""}`.toLowerCase().includes(query.toLowerCase()));return <Page title={`Manage ${isVoter?'Voters':'Candidates'}`} subtitle={isVoter?'Manage registered voters in your constituency.':'Manage candidates in your constituency.'} action={<Button onClick={()=>setEditor({})}><Plus size={15}/>Register {isVoter?'voter':'candidate'}</Button>}><div className="relative mb-4 max-w-md"><Search size={16} className="absolute left-3 top-3 text-slate-400"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={`Search ${isVoter?'name or EPIC number':'candidate or constituency'}`} className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm"/></div><Card className="overflow-x-auto p-0"><table className="w-full text-left text-sm">
+${x.constituencyId?.constituencyNumber || ""}`.toLowerCase().includes(query.toLowerCase()));return <Page title={`Manage ${isVoter?'Voters':'Candidates'}`} subtitle={isVoter?'Manage registered voters in your constituency.':'Manage candidates in your constituency.'}action={
+    !isVoter && (
+        <Button onClick={() => setEditor({})}>
+            <Plus size={15} />
+            Register Candidate
+        </Button>
+    )
+}><div className="relative mb-4 max-w-md"><Search size={16} className="absolute left-3 top-3 text-slate-400"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={`Search ${isVoter?'name or EPIC number':'candidate or constituency'}`} className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-3 text-sm"/></div><Card className="overflow-x-auto p-0"><table className="w-full text-left text-sm">
   <thead className="border-b bg-slate-50 text-xs uppercase text-slate-500">
   {isVoter ? (
     <tr>
@@ -715,7 +757,304 @@ ${x.constituencyId?.constituencyNumber || ""}`.toLowerCase().includes(query.toLo
 </Page> }
 
 
-function RecordForm({isVoter,editor,save,close}){return <Modal title={`${editor._id?'Edit':'Register'} ${isVoter?'Voter':'Candidate'}`} onClose={close}><form onSubmit={save} className="space-y-4"><div className="grid grid-cols-2 gap-3"><Field label="Name" name="name" required defaultValue={editor.name}/><Field label={isVoter?'EPIC number':'Candidate ID'} name={isVoter?'epicNumber':'id'} required={!editor._id} defaultValue={isVoter?editor.epicNumber:editor.id}/></div>{isVoter&&!editor._id&&<><Field label="Voter user ID" name="userId" required/><Field label="Password" name="password" type="password" required/></>}{isVoter?<Select label="Account status" name="status" defaultValue={editor.status||'active'}><option>active</option><option>inactive</option><option>suspended</option></Select>:<><Field label="Criminal case / declaration" name="criminalCase" defaultValue={editor.criminalCase}/>{!editor._id&&<><Field label="Candidate photo" name="candidateImage" type="file" accept="image/*" required/><Field label="Party emblem" name="partyImage" type="file" accept="image/*" required/></>}</>} {isVoter&&!editor._id&&<Field label="Profile photo (optional)" name="photoUrl" type="file" accept="image/*"/>}<div className="flex justify-end gap-2"><Button type="button" className="bg-slate-100 text-slate-700" onClick={close}>Cancel</Button><Button type="submit">Save</Button></div></form></Modal>}
+function RecordForm({ isVoter, editor, save, close, admin }) {
+
+  return (
+
+    <Modal
+      title={`${editor._id ? "Edit" : "Register"} ${isVoter ? " Voter" : " Candidate"}`}
+      onClose={close}
+    >
+
+      <form
+        onSubmit={save}
+        className="space-y-5"
+      >
+
+        {isVoter ? (
+
+          <>
+
+            {/* Personal Information */}
+
+            <div>
+
+              <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">
+                Personal Information
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <Field
+                  label="Full Name"
+                  name="name"
+                  required
+                  defaultValue={editor.name}
+                />
+
+                <Field
+                  label="EPIC Number"
+                  name="epicNumber"
+                  required
+                  defaultValue={editor.epicNumber}
+                />
+
+                <Field
+                  label="Date of Birth"
+                  name="dob"
+                  type="date"
+                  required
+                />
+
+                <Select
+                  label="Gender"
+                  name="gender"
+                  defaultValue={editor.gender || "Male"}
+                >
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Other</option>
+                </Select>
+
+                <Field
+                  label="Guardian Name"
+                  name="guardianName"
+                  required
+                />
+
+                <Field
+                  label="Mobile Number"
+                  name="mobile"
+                  required
+                />
+
+              </div>
+
+            </div>
+
+            {/* Address & Photo */}
+
+            <div>
+
+              <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">
+                Address & Photograph
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <Field
+                  label="House Number"
+                  name="houseNo"
+                />
+
+                <Field
+                  label="Street"
+                  name="street"
+                />
+
+                <Field
+                  label="Pincode"
+                  name="pincode"
+                />
+
+                <Field
+                  label="Photograph"
+                  name="photo"
+                  type="file"
+                  accept="image/*"
+                  required={!editor._id}
+                />
+
+              </div>
+
+            </div>
+
+            {/* Assigned Area */}
+
+            <div>
+
+              <h3 className="mb-3 text-sm font-bold uppercase tracking-wide text-slate-500">
+                Assigned Area
+              </h3>
+
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+
+                <div className="grid grid-cols-3 gap-4 text-center">
+
+                  <div>
+
+                    <p className="text-xs uppercase text-slate-500">
+                      State
+                    </p>
+
+                    <p className="mt-1 font-semibold text-slate-800">
+                      {admin?.state || "-"}
+                    </p>
+
+                  </div>
+
+                  <div>
+
+                    <p className="text-xs uppercase text-slate-500">
+                      District
+                    </p>
+
+                    <p className="mt-1 font-semibold text-slate-800">
+                      {admin?.district || "-"}
+                    </p>
+
+                  </div>
+
+                  <div>
+
+                    <p className="text-xs uppercase text-slate-500">
+                      City
+                    </p>
+
+                    <p className="mt-1 font-semibold text-slate-800">
+                      {admin?.city || "-"}
+                    </p>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Status & Account */}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <Select
+                label="Account Status"
+                name="status"
+                defaultValue={editor.status || "active"}
+              >
+                <option value="active">
+                  Active
+                </option>
+
+                <option value="inactive">
+                  Inactive
+                </option>
+
+                <option value="suspended">
+                  Suspended
+                </option>
+
+              </Select>
+
+              {!editor._id && (
+
+                <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+
+                  <h4 className="font-semibold text-blue-900">
+                    Automatic Registration
+                  </h4>
+
+                  <ul className="mt-2 list-disc pl-5 text-sm text-blue-800 space-y-1">
+
+                    <li>User ID = EPIC Number</li>
+
+                    <li>Password generated automatically</li>
+
+                    <li>Photo processed automatically</li>
+
+                    <li>Face biometric enrolled automatically</li>
+
+                  </ul>
+
+                </div>
+
+              )}
+
+            </div>
+
+          </>
+
+        ) : (
+
+          <>
+
+            <div className="grid grid-cols-2 gap-3">
+
+              <Field
+                label="Name"
+                name="name"
+                required
+                defaultValue={editor.name}
+              />
+
+              <Field
+                label="Candidate ID"
+                name="id"
+                required={!editor._id}
+                defaultValue={editor.id}
+              />
+
+            </div>
+
+            <Field
+              label="Criminal Case / Declaration"
+              name="criminalCase"
+              defaultValue={editor.criminalCase}
+            />
+
+            {!editor._id && (
+
+              <div className="grid grid-cols-2 gap-3">
+
+                <Field
+                  label="Candidate Photo"
+                  name="candidateImage"
+                  type="file"
+                  accept="image/*"
+                  required
+                />
+
+                <Field
+                  label="Party Symbol"
+                  name="partyImage"
+                  type="file"
+                  accept="image/*"
+                  required
+                />
+
+              </div>
+
+            )}
+
+          </>
+
+        )}
+
+        <div className="flex justify-end gap-3 pt-2">
+
+          <Button
+            type="button"
+            className="bg-slate-100 text-slate-700"
+            onClick={close}
+          >
+            Cancel
+          </Button>
+
+          <Button type="submit">
+
+            {editor._id ? "Update" : "Register"}
+
+          </Button>
+
+        </div>
+
+      </form>
+
+    </Modal>
+
+  );
+
+}
 function SettingsPage(){return <Page title="System Settings" subtitle="Maintain core election-system settings."><div className="max-w-3xl space-y-4"><Card><h2 className="font-bold">Results publication</h2><p className="mt-1 text-sm text-slate-500">Publish results only after the election has been completed and verified.</p></Card><Card><h2 className="font-bold">Security controls</h2><p className="mt-1 text-sm text-slate-500">Administrator permissions are assigned through election and constituency assignments.</p></Card></div></Page>}
 function Profile({notify}){const [me,setMe]=useState(null);useEffect(()=>{api('/api/admin/me',{role:'admin'}).then(setMe).catch(e=>notify(e.message,'error'))},[notify]);return <Page title="Profile" subtitle="Your assigned election and constituency."><Card className="max-w-2xl"><div className="grid gap-4 sm:grid-cols-2"><p><b>Name</b><br/>{me?.name||'—'}</p><p><b>Email / User ID</b><br/>{me?.userId||'—'}</p><p><b>Assigned election</b><br/>{me?.election?.title||'—'}</p><p><b>Assigned constituency</b><br/>{me?.constituency?.name||me?.address?.area||'—'}</p></div><p className="mt-6 border-t pt-5 text-sm text-slate-500">Password and profile-image updates are ready for the administrator profile API.</p></Card></Page>}
 function Confirm({title,text,onClose,onConfirm}){return <Modal title={title} onClose={onClose}><p className="text-sm text-slate-600">{text}</p><div className="mt-6 flex justify-end gap-2"><Button className="bg-slate-100 text-slate-700" onClick={onClose}>Cancel</Button><Button className="bg-red-600 hover:bg-red-700" onClick={onConfirm}>Confirm</Button></div></Modal>}; const formatDate=v=>v?new Date(v).toLocaleDateString():'—'; const toInputDate=v=>v?new Date(v).toISOString().slice(0,16):'';

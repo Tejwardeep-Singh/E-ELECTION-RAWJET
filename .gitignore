@@ -1,1 +1,23 @@
 node_modules
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Python virtual environment
+venv/
+.venv/
+env/
+
+# Face service venv
+server/face/venv/
+
+# Python generated files
+*.npy
+
+# Processed images (optional)
+server/storage/processed/
+
+# Logs
+*.log

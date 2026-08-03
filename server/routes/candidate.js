@@ -10,6 +10,13 @@ const Admin = require('../models/admin');
 const Election = require('../models/election');
 const Constituency = require('../models/constituency');
 const bcrypt = require('bcrypt');
+const generateDefaultPassword = require("../utils/generateDefaultPassword");
+const hashPassword = require("../scripts/helpers/hashPassword");
+const processPhoto = require("../scripts/helpers/processPhoto");
+const createVoter = require("../scripts/helpers/createVoter");
+const enrollFace = require("../scripts/helpers/enrollFace");
+const MasterConstituency = require("../models/masterConstituency");
+
 
 router.get('/me', authenticate, loadAdmin, async (req, res) => {
   try {
