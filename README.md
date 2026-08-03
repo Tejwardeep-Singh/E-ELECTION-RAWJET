@@ -958,7 +958,6 @@ BharatBallot
 
 Detailed technical documentation is available inside the **docs/** directory.
 
-<p align='center>
 
 | Document | Description |
 |----------|-------------|
@@ -971,7 +970,6 @@ Detailed technical documentation is available inside the **docs/** directory.
 | 📖 USER_GUIDE.md | User Manual |
 | 📘 SRS.md | Software Requirements Specification |
 
-</p>
 
 ---
 
