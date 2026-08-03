@@ -11,6 +11,10 @@ const { enrollVoterFace } = require('../services/faceEnrollment');
 const Election = require("../models/election");
 const Constituency = require("../models/constituency");
 const Participation = require("../models/participation");
+const fs = require("fs/promises");
+const path = require("path");
+const axios = require("axios");
+const FormData = require("form-data");
 const syncElectionStatus = require("../services/syncElectionStatus");
 
 const uploadVoterImage = (req, res, next) => {
@@ -588,5 +592,125 @@ router.put(
         message: "Server error"
       });
     }
+});
+router.post("/verify-face", authenticateVoter, async (req, res) => {
+
+    let tempImage = null;
+
+    try {
+
+        const { image } = req.body;
+
+        if (!image) {
+            return res.status(400).json({
+                success: false,
+                message: "Image not received."
+            });
+        }
+
+        const voter = await Voter.findById(req.voterId)
+    .select("+biometric.faceEmbeddingPath");
+
+        if (!voter) {
+            return res.status(404).json({
+                success: false,
+                message: "Voter not found."
+            });
+        }
+
+        const base64Data = image.replace(
+            /^data:image\/\w+;base64,/,
+            ""
+        );
+
+        const tempDirectory = path.join(
+            __dirname,
+            "../storage/temp"
+        );
+
+        await fs.mkdir(tempDirectory, {
+            recursive: true,
+        });
+
+        tempImage = path.join(
+            tempDirectory,
+            `${voter.epicNumber}.jpg`
+        );
+
+        await fs.writeFile(
+            tempImage,
+            base64Data,
+            "base64"
+        );
+
+        const form = new FormData();
+
+        form.append(
+            "epic",
+            voter.epicNumber
+        );
+
+        form.append(
+            "file",
+            require("fs").createReadStream(tempImage)
+        );
+
+        const { data } = await axios.post(
+
+            `${process.env.FACE_API}/verify`,
+
+            form,
+
+            {
+                headers: form.getHeaders(),
+            }
+
+        );
+
+        voter.lastVerification.success = data.match;
+
+        voter.lastVerification.confidence = data.confidence;
+
+        voter.lastVerification.time = new Date();
+
+        voter.lastVerification.method = "face";
+
+        await voter.save();
+
+        return res.json(data);
+
+    } catch (err) {
+
+        console.error("Face Verification Error:", err);
+
+        return res.status(500).json({
+
+            success: false,
+
+            message: "Face verification failed."
+
+        });
+
+    } finally {
+
+        if (tempImage) {
+
+            try {
+
+                await fs.unlink(tempImage);
+
+            } catch (cleanupError) {
+
+                console.error(
+                    "Unable to delete temporary image:",
+                    cleanupError.message
+                );
+
+            }
+
+        }
+
+    }
+
 });
 module.exports = router;

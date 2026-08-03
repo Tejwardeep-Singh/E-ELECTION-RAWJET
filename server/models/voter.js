@@ -151,16 +151,5 @@ address: {
     timestamps: true,
   }
 );
-voterSchema.index({
-    "constituencies.municipal": 1,
-});
-
-voterSchema.index({
-    "constituencies.assembly": 1,
-});
-
-voterSchema.index({
-    "constituencies.lokSabha": 1,
-});
 
 module.exports = mongoose.model("Voter", voterSchema);

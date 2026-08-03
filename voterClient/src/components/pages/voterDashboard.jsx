@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from 'axios';
 import { BarChart3, Camera, CheckCircle2, Gavel, Image as ImageIcon, MapPin, ShieldCheck, User, Vote, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import ElectionStatusWidget from "../pages/ElectionStatusWidget";
+import Webcam from "react-webcam";
 
 const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -27,6 +28,13 @@ export default function VoterDashboard() {
   const [updatingPhoto, setUpdatingPhoto] = useState(false);
   const [modalConfig, setModalConfig] = useState({ isOpen: false, title: '', description: '', candidateId: null, candidateName: '' });
   const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'success', message: '' });
+  const webcamRef = useRef(null);
+  const [faceVerification, setFaceVerification] = useState({
+      open: false,
+      candidateId: null,
+      candidateName: "",
+      loading: false,
+  });
   const [selectedElectionData, setSelectedElectionData] = useState(null);
   const [alreadyVoted, setAlreadyVoted] = useState(false);
   const [declaration, setDeclaration] = useState(null);
@@ -139,6 +147,102 @@ useEffect(() => {
       triggerAlert('error', error.response?.data?.message || 'Ballot verification failed. Transaction rejected by network rules.');
     }
   };
+const verifyFace = async () => {
+
+    try {
+
+        setFaceVerification(current => ({
+            ...current,
+            loading: true,
+        }));
+
+        const image = webcamRef.current.getScreenshot();
+
+        if (!image) {
+
+            triggerAlert(
+                "error",
+                "Unable to capture image."
+            );
+
+            return;
+        }
+
+        const { data } = await axios.post(
+
+            `${API_URL}/api/voter/verify-face`,
+
+            {
+                image,
+            },
+
+            {
+                headers,
+            }
+
+        );
+console.log(data);
+        if (data.success && data.match) {
+
+            setFaceVerification({
+
+                open: false,
+
+                candidateId: null,
+
+                candidateName: "",
+
+                loading: false,
+
+            });
+
+            handleVoteConfirmation(
+
+                faceVerification.candidateId,
+
+                faceVerification.candidateName
+
+            );
+
+        } else {
+
+            triggerAlert(
+
+                "error",
+
+                `Face verification failed.\nConfidence: ${(
+                    data.confidence * 100
+                ).toFixed(2)}%`
+
+            );
+
+        }
+
+    } catch (err) {
+
+        triggerAlert(
+
+            "error",
+
+            err.response?.data?.message ||
+
+            "Unable to verify face."
+
+        );
+
+    } finally {
+
+        setFaceVerification(current => ({
+
+            ...current,
+
+            loading: false,
+
+        }));
+
+    }
+
+};
 
   
 
@@ -304,7 +408,14 @@ if (!selectedElectionData) {
     </div>
 ) : canVote ? (
     <button
-        onClick={() => handleVoteConfirmation(candidate._id, candidate.name)}
+        onClick={() =>
+    setFaceVerification({
+        open: true,
+        candidateId: candidate._id,
+        candidateName: candidate.name,
+        loading: false,
+    })
+}
         className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold text-xs rounded-xl py-2.5 shadow-sm uppercase tracking-wider"
     >
         <Vote size={14} />
@@ -358,7 +469,61 @@ if (!selectedElectionData) {
 )}</div>}</section>
     <button onClick={() => navigate(`/voter/results/${selectedElection}`)} className="w-full inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-black text-white py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-widest shadow-sm"><BarChart3 size={15} />View Verified Election Results Portal</button>
   </div>
+  {
+faceVerification.open && (
+
+<div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40">
+
+<div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-xl">
+
+<h2 className="text-xl font-black">
+Identity Verification
+</h2>
+
+<p className="mt-2 text-sm text-slate-500">
+Please look directly into the camera before casting your vote.
+</p>
+
+<Webcam
+    ref={webcamRef}
+    audio={false}
+    screenshotFormat="image/jpeg"
+    className="mt-5 rounded-2xl border"
+/>
+
+<div className="mt-6 flex gap-3">
+
+<button
+onClick={()=>setFaceVerification({
+    open:false,
+    candidateId:null,
+    candidateName:"",
+    loading:false
+})}
+className="flex-1 rounded-xl border py-3"
+>
+Cancel
+</button>
+
+<button
+    onClick={verifyFace}
+    disabled={faceVerification.loading}
+    className="flex-1 rounded-xl bg-blue-600 py-3 text-white disabled:opacity-60"
+>
+    {faceVerification.loading
+        ? "Verifying..."
+        : "Capture & Verify"}
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+)}
   {modalConfig.isOpen && <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs"><div className="w-full max-w-md bg-white border border-slate-200/80 rounded-3xl p-6 md:p-8 shadow-lg space-y-6 text-center"><div className="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center mx-auto"><Vote size={22} /></div><div><h3 className="text-lg font-black text-slate-900">{modalConfig.title}</h3><p className="mt-1.5 text-xs font-medium text-slate-500 leading-relaxed">{modalConfig.description}</p></div><div className="flex gap-3"><button onClick={() => setModalConfig((current) => ({ ...current, isOpen: false }))} className="w-1/2 bg-white border border-slate-200 text-slate-700 text-xs font-bold uppercase rounded-xl py-3">Cancel</button><button onClick={executeVote} className="w-1/2 bg-blue-600 text-white text-xs font-bold uppercase rounded-xl py-3">Sign & Transmit Ballot</button></div></div></div>}
   {alertConfig.isOpen && <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/20 backdrop-blur-xs"><div className="w-full max-w-sm bg-white border border-slate-200/80 rounded-3xl p-6 shadow-md text-center space-y-5"><div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto border ${alertConfig.type === 'success' ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-red-50 border-red-100 text-red-600'}`}>{alertConfig.type === 'success' ? <CheckCircle2 size={22} /> : <AlertTriangle size={22} />}</div><p className="text-xs font-semibold text-slate-800">{alertConfig.message}</p><button onClick={() => setAlertConfig((current) => ({ ...current, isOpen: false }))} className="w-full bg-slate-900 text-white text-xs font-bold uppercase rounded-xl py-2.5">Acknowledge</button></div></div>}
   </div>;
+  
 }
