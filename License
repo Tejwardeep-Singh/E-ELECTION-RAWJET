@@ -1,21 +1,132 @@
-# MIT License
+===============================================================================
+                        BHARAT BALLOT LICENSE (BBL) v1.0
+===============================================================================
 
-Copyright (c) 2026 Tejwardeep Singh
+Copyright © 2026 Team RawJet.
+All Rights Reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+===============================================================================
+PROJECT
+===============================================================================
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Bharat Ballot is an AI-powered Digital Election Management Platform designed,
+developed, and owned by Team RawJet.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+This project includes, but is not limited to:
+
+• Source Code
+• Frontend Applications
+• Backend APIs
+• AI Face Recognition Service
+• Database Design
+• User Interface
+• Documentation
+• Architecture
+• Graphics
+• Images
+• Logos
+• Project Branding
+
+All intellectual property rights associated with Bharat Ballot remain the
+exclusive property of Team RawJet.
+
+===============================================================================
+PERMITTED USE
+===============================================================================
+
+You MAY:
+
+✓ View the source code.
+
+✓ Fork this repository for educational or research purposes.
+
+✓ Study and modify the source code locally.
+
+✓ Submit Pull Requests to improve the project.
+
+✓ Reference this project in academic work with proper attribution.
+
+===============================================================================
+RESTRICTIONS
+===============================================================================
+
+Without prior written permission from Team RawJet, you MAY NOT:
+
+✗ Sell this software.
+
+✗ Rebrand this project.
+
+✗ Remove or modify copyright notices.
+
+✗ Claim this project as your own.
+
+✗ Publish this project under another organization or individual.
+
+✗ Deploy this project commercially.
+
+✗ Use the Bharat Ballot name, branding, or logo in derivative projects.
+
+✗ Copy significant portions of the UI/UX or overall system design for
+  commercial purposes.
+
+✗ Redistribute modified versions without clearly stating that they are based on
+  Bharat Ballot.
+
+===============================================================================
+CONTRIBUTIONS
+===============================================================================
+
+By submitting a Pull Request, you agree that your contribution becomes part of
+the Bharat Ballot project and may be incorporated into future releases under
+this license.
+
+===============================================================================
+ATTRIBUTION
+===============================================================================
+
+If this project or parts of it are used for research, demonstrations,
+educational purposes, presentations, or derivative academic work, proper
+acknowledgement must be provided.
+
+Example:
+
+"Based on Bharat Ballot by Team RawJet."
+
+===============================================================================
+DISCLAIMER
+===============================================================================
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+IN NO EVENT SHALL TEAM RAWJET BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+LIABILITY ARISING FROM THE USE OF THIS SOFTWARE.
+
+===============================================================================
+TRADEMARK
+===============================================================================
+
+"Bharat Ballot" and "Team RawJet" are project identifiers belonging to
+Team RawJet.
+
+Use of the project name, logo, branding, or visual identity without prior
+written permission is prohibited.
+
+===============================================================================
+CONTACT
+===============================================================================
+
+Organization:
+Team RawJet
+
+Project:
+Bharat Ballot
+
+GitHub:
+https://github.com/Tejwardeep-Singh/E-ELECTION-RAWJET
+
+===============================================================================
+© 2026 Team RawJet
+All Rights Reserved.
+===============================================================================
