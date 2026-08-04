@@ -1,59 +1,133 @@
 import React from 'react';
 import { ShieldCheck } from 'lucide-react';
 import Footer from "../Footer";
+import indiaMap from "../../assets/in.svg"
+import logo from "../../assets/logo.png";
+import { Link } from "react-router-dom";
 
 
 export default function Home() {
   return (
-    <div className="bg-[#F8FBFF] text-[#0F172A] font-sans relative overflow-hidden select-none antialiased">
+    <div className="bg-white text-[#0F172A] font-sans relative overflow-hidden select-none antialiased">
       
      
+      {/* ---------------- HERO ---------------- */}
 
-      {/* --- HERO / MAIN CORE CONTENT --- */}
-      <div className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
-         {/* Structural Security Background Layers */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.04),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(15,23,42,0.02),transparent_40%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:6rem_6rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30" />
-        <main className="relative z-10 flex flex-col items-center justify-center text-center w-full max-w-4xl">
-        
-        {/* Official Security Seal */}
-        <div className="relative inline-flex items-center justify-center w-28 h-28 mb-10 mx-auto">
-          {/* Slow Spin Geometry */}
-          <div className="absolute inset-0 rounded-full border border-dashed border-blue-600/30 animate-[spin_60s_infinite_linear]" />
-          {/* Inner Shield Matrix */}
-          <div className="absolute inset-3 rounded-full bg-gradient-to-tr from-slate-50 via-white to-blue-50/40 border border-slate-200 shadow-inner flex items-center justify-center">
-            <svg className="w-12 h-12 text-blue-600 drop-shadow-xs" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-            </svg>
-          </div>
-        </div>
+<section className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#F8FBFF] to-white">
 
-        {/* Branding Typography */}
-        <h1 className="flex items-center justify-center gap-4 text-5xl md:text-7xl font-black tracking-tight text-[#0F172A] mb-6 font-display">
-          <span className="flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-b from-blue-600 to-blue-700 text-white rounded-2xl shadow-xl shadow-blue-600/10 text-3xl md:text-4xl font-serif font-extrabold">
-            B
-          </span>
-          <span className="tracking-tight">
-            Bharat<span className="bg-gradient-to-r from-orange-500 via-amber-500 to-emerald-600 bg-clip-text text-transparent">Ballot</span>
-          </span>
-        </h1>
-        
-        {/* Subtle Decorative Accent Rule */}
-        <div className="w-16 h-[3px] bg-blue-600 rounded-full mx-auto mb-8" />
+  {/* Soft Glow */}
+  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.08),transparent_45%)]" />
 
-        {/* Master Tagline Statement */}
-        <p className="text-xl md:text-2xl text-[#64748B] font-normal max-w-2xl mx-auto leading-relaxed tracking-tight">
-          Empowering democracy <span className="text-blue-600 font-semibold underline decoration-blue-600/20 decoration-2 underline-offset-8">digitally</span> and <span className="text-blue-600 font-semibold underline decoration-blue-600/20 decoration-2 underline-offset-8">securely</span>.
-        </p>
+  <div className="relative z-10 max-w-7xl mx-auto min-h-screen px-6 lg:px-12 flex flex-col-reverse lg:flex-row items-center justify-center gap-20">
 
-        {/* Civic Trust Badge Indicator */}
-        <div className="mt-12 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#64748B] bg-white border border-slate-200/80 rounded-full px-4 py-1.5 shadow-xs backdrop-blur-xs">
-          <ShieldCheck size={13} className="text-emerald-600 stroke-[2.5]" />
-          Verified Secure Democratic Infrastructure
-        </div>
+    {/* ---------------- LEFT : INDIA MAP ---------------- */}
 
-      </main>
+    <div className="flex-1 flex justify-center items-center">
+
+      <img
+        src={indiaMap}
+        alt=""
+        aria-hidden="true"
+        className="
+          w-full
+          max-w-2xl
+          max-h-[80vh]
+          object-contain
+          opacity-[0.40]
+          pointer-events-none
+          select-none
+        "
+      />
+
+    </div>
+
+    {/* ---------------- RIGHT : CONTENT ---------------- */}
+
+    <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left">
+
+      {/* Small Label */}
+
+      <div className="mb-6 inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-blue-700">
+
+        DIGITAL DEMOCRACY PLATFORM
+
       </div>
+
+      {/* Official Logo */}
+
+      <img
+        src={logo}
+        alt="Bharat Ballot"
+        className="h-28 lg:h-36 w-auto object-contain"
+      />
+
+      {/* Heading */}
+
+      <h2 className="mt-8 text-4xl lg:text-5xl font-extrabold leading-tight text-slate-900 max-w-xl">
+
+        India's Secure Digital Election Platform
+
+      </h2>
+
+      {/* Accent Line */}
+
+      <div className="mt-6 h-1 w-24 rounded-full bg-blue-600" />
+
+      {/* Tagline */}
+
+      <p className="mt-8 text-xl leading-8 text-slate-600 max-w-lg">
+
+        Empowering democracy through
+        <span className="font-semibold text-blue-600"> secure</span>,
+        <span className="font-semibold text-blue-600"> transparent</span>,
+        and
+        <span className="font-semibold text-blue-600"> digital</span>
+        election management.
+
+      </p>
+
+      {/* CTA Buttons */}
+
+      <div className="mt-12 flex flex-wrap justify-center lg:justify-start gap-4">
+
+        <Link
+          to="/admin"
+          className="rounded-xl bg-blue-600 px-8 py-4 font-semibold text-white shadow-lg shadow-blue-600/20 transition-all duration-300 hover:-translate-y-1 hover:bg-blue-700"
+        >
+          Admin Login
+        </Link>
+
+        <Link
+          to="/head"
+          className="rounded-xl border border-slate-300 bg-white px-8 py-4 font-semibold text-slate-700 transition-all duration-300 hover:border-blue-600 hover:text-blue-600"
+        >
+          Head Login
+        </Link>
+
+      </div>
+
+      {/* Trust Badge */}
+
+      <div className="mt-12 inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-5 py-3 shadow-sm">
+
+        <ShieldCheck
+          size={18}
+          className="text-emerald-600"
+        />
+
+        <span className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
+
+          VERIFIED SECURE DEMOCRATIC INFRASTRUCTURE
+
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
       <Footer />
 
     </div>
