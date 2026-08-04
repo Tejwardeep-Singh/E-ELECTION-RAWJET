@@ -1,16 +1,20 @@
 import React from 'react';
 import { ShieldCheck } from 'lucide-react';
+import Footer from "../Footer";
+
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#F8FBFF] text-[#0F172A] font-sans flex flex-col justify-between relative overflow-hidden select-none antialiased">
+    <div className="bg-[#F8FBFF] text-[#0F172A] font-sans relative overflow-hidden select-none antialiased">
       
-      {/* Structural Security Background Layers */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.04),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(15,23,42,0.02),transparent_40%)]" />
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:6rem_6rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30" />
+     
 
       {/* --- HERO / MAIN CORE CONTENT --- */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 py-12 text-center max-w-4xl mx-auto">
+      <div className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
+         {/* Structural Security Background Layers */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(37,99,235,0.04),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(15,23,42,0.02),transparent_40%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:6rem_6rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30" />
+        <main className="relative z-10 flex flex-col items-center justify-center text-center w-full max-w-4xl">
         
         {/* Official Security Seal */}
         <div className="relative inline-flex items-center justify-center w-28 h-28 mb-10 mx-auto">
@@ -49,6 +53,8 @@ export default function Home() {
         </div>
 
       </main>
+      </div>
+      <Footer />
 
     </div>
   );

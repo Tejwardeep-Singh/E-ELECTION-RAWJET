@@ -11,6 +11,7 @@ import ElectionSelector from './components/elections/ElectionSelector';
 import { ElectionProvider, useElection } from './context/ElectionContext';
 import AdminResults from "./components/pages/AdminResults";
 import { api } from './services/api';
+import Copyright from "./components/Copywright";
 
 function Toast({ toast, clear }) { return toast && <div className={`fixed right-5 top-5 z-[100] rounded-xl px-4 py-3 text-sm font-semibold shadow-lg ${toast.type === 'error' ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'}`} onClick={clear}>{toast.message}</div>; }
 function Modal({ title, children, onClose }) {
@@ -1062,4 +1063,4 @@ function Confirm({title,text,onClose,onConfirm}){return <Modal title={title} onC
 export default function App(){const [toast,notify,clear]=useNotify();const shell=(role,el)=><Guard role={role}><PortalShell role={role}>{el}</PortalShell></Guard>;return <ElectionProvider><Routes><Route path="/" element={<><Nav/><Home/></>}/><Route path="/head" element={<><Nav/><HeadLogin/></>}/><Route path="/admin" element={<><Nav/><AdminLogin/></>}/><Route path="/head/dashboard" element={shell('head',<HeadOverview notify={notify}/>)}/><Route path="/head/election" element={shell('head',<Elections notify={notify}/>)}/><Route path="/head/viewAdmins" element={shell('head',<Admins notify={notify}/>)}/><Route path="/head/results" element={shell('head', <HeadResults />)}/><Route path="/head/settings" element={shell('head',<SettingsPage/>)}/><Route path="/admin/dashboard" element={shell('admin',<AdminOverview notify={notify}/>)}/><Route path="/admin/voters" element={shell('admin',<Directory kind="voter" notify={notify}/>)}/><Route path="/admin/candidate/view" element={shell('admin',<Directory kind="candidate" notify={notify}/>)}/><Route path="/admin/profile" element={shell('admin',<Profile notify={notify}/>)}/><Route
   path="/admin/results"
   element={shell('admin', <AdminResults />)}
-/><Route path="*" element={<Navigate to="/" replace/>}/></Routes><Toast toast={toast} clear={clear}/></ElectionProvider>}
+/><Route path="*" element={<Navigate to="/" replace/>}/></Routes><Copyright /><Toast toast={toast} clear={clear}/></ElectionProvider>}
